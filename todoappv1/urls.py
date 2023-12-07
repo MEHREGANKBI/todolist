@@ -8,5 +8,5 @@ urlpatterns = [
     path("retrieve_undone/", views.retrieve_undone, name = "retrieve_undone_todolist"),
     path("done/<int:id_param>/", views.done, name="status_done"),
     path("add_activity/<str:activity_param>/", views.add_activity, name = "add_activity"),
-    #path("remove/<int:id_param>/", views.remove_activty, name = "remove_activity")
+    path("remove_activity/<int:id_param>/", views.remove_activity, name = "remove_activity")
 ]

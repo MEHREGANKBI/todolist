@@ -41,3 +41,14 @@ def done(request, id_param):
     response_pretty = json.dumps(done_response , indent = 2)
     return HttpResponse(response_pretty)
 
+def remove_activity(request, id_param):
+    id_param = int(id_param)
+    todolist_object = Todolist.objects.get(id=id_param)
+    todolist_object.delete()
+    remove_response = [ { "status" : "success" }, 
+            {"activity_with_the_following_id_was_permanently_removed" : id_param } ]
+    response_pretty = json.dumps(remove_response, indent =2)
+    return HttpResponse(response_pretty)
+
+
+
