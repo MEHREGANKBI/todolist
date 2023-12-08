@@ -31,6 +31,8 @@ ALLOWED_HOSTS = [ '*' ]
 # Application definition
 
 INSTALLED_APPS = [
+    "rest_framework",
+    "todoappv2.apps.Todoappv2Config",
     "todoappv1.apps.Todoappv1Config",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -122,3 +124,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
+}
