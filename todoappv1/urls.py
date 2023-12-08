@@ -2,6 +2,8 @@ from django.urls import path
 
 from . import views
 
+app_name = "todoappv1"
+
 urlpatterns = [
     path("", views.index, name="index"),
     path("retrieve_all/", views.retrieve_all, name="retrieve_all_todolist"),
