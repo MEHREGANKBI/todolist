@@ -1,7 +1,11 @@
 from rest_framework import serializers
+from .models import Todolist
 
-class TodolistSerializer(serializers.Serializer):
-    activity_description = serializers.CharField(max_length = 200)
-    done_status = serializers.BooleanField()
+
+class TodolistSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Todolist
+        fields = [ 'activity_description' , 'done_status']
 
 

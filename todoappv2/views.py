@@ -9,23 +9,22 @@ from .serializers import TodolistSerializer
 class TodolistCRUDView(APIView):
 
     def get(self, request):
-        ret_val = { "message" : "Your GET request was received" , 
-                    "request.query_params" : request.query_params.__str__() ,
-                    "request.data" : request.data.__str__(),
-                    "request.POST" : request.POST.__str__(),
-                    "reuqest.GET" : request.GET.__str__(),
-                    "dir(request)" : dir(request).__str__(),
-                    }
+        ret_val = {"message" : "Your GET request was received",
+                   "data" : request.data.__str__(),
+                   "post" : request.POST.__str__(),
+                   "get" : request.GET.__str__(),
+                   "query_params" : request.query_params.__str__()}
         return Response(ret_val , status = status.HTTP_200_OK)
 
-    def post(self, request):
-        serializer = TodolistSerializer(data = request.data)
-        ret_val  = { "message" : "data deserialization was successful", }
-        if not serializer.is_valid():
-            ret_val = serializer.errors
-            return Response(ret_val , status = status.HTTP_400_BAD_REQUEST)
-        Todolist.objects.create(**serializer.validated_data)
-        return Response(ret_val, status = status.HTTP_200_OK)
+    # def post(self, request):
+    #     serializer = TodolistSerializer(data = request.data)
+    #     ret_val  = { "message" : "data deserialization was successful", }
+    #     if not serializer.is_valid():
+    #         ret_val = serializer.errors
+    #         return Response(ret_val , status = status.HTTP_400_BAD_REQUEST)
+    #     Todolist.objects.create(**serializer.validated_data)
+    #     return Response(ret_val, status = status.HTTP_200_OK)
+
     def delete(self, request):
         ret_val = { "message" : "Your DELETE request was received" , }
         return Response(ret_val , status = status.HTTP_200_OK)
