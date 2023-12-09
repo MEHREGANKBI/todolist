@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from todoappv2.models import Todolist
+from .models import Todolist
 #from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
@@ -9,20 +9,40 @@ from .serializers import TodolistSerializer
 class TodolistCRUDView(APIView):
 
     def get(self, request):
-        ret_val = {"message" : "Your GET request was received",
-                   "the type requested" : request.query_params['type'],
-        }
+        model_objects = None
+        serialized_objects = None
+        ret_val = None
+        retrieval_type = request.query_params.dict().get('type', 0)
+        if not retrieval_type:
+            ret_val = { "usage_error" : "Required key \"type\" was not found in the request!"}
+            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+        
+        retrieval_type = retrieval_type.strip().upper()
+        if retrieval_type == "ALL" :
+            serialized_objects = TodolistSerializer(Todolist.objects.all(), many = True)
+            ret_val = { "retrieval_type" : "ALL",
+                       "payload" : [ item['activity_description'] for item in serialized_objects.data]
+            }
+        elif retrieval_type == "DONE" :
+            serialized_objects = TodolistSerializer(Todolist.objects.filter(done_status = True), many = True)
+            ret_val = {"retrieval_type" : "DONE",
+                       "payload" : [ item['activity_description'] for item in serialized_objects.data],
+            }
+        elif retrieval_type == "UNDONE" :
+            serialized_objects = TodolistSerializer(Todolist.objects.filter(done_status = False), many = True)
+            ret_val = { "retrieval_type" : "UNDONE",
+                       "payload" : [ item['activity_description'] for item in serialized_objects.data]
+            }
+        else :
+            ret_val = {"usage_error" : "The value entered for \"type\" is invalid!",
+                       "value received" : str(retrieval_type)}
+            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+             
+
         return Response(ret_val , status = status.HTTP_200_OK)
     
-    def post(self, request):
-        ret_val = {"message" : "Your GET request was received",
-            "data" : request.data.__str__(),
-            "post" : request.POST.__str__(),
-            "get" : request.GET.__str__(),
-            "query_params" : request.query_params.__str__()}
-        return Response(ret_val , status = status.HTTP_200_OK)
 
-# def post(self, request):
+   def post(self, request):
     #     serializer = TodolistSerializer(data = request.data)
     #     ret_val  = { "message" : "data deserialization was successful", }
     #     if not serializer.is_valid():
