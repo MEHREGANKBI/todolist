@@ -8,4 +8,3 @@ class TodolistSerializer(serializers.ModelSerializer):
         model = Todolist
         fields = [ 'activity_description' , 'done_status']
 
-

@@ -10,13 +10,19 @@ class TodolistCRUDView(APIView):
 
     def get(self, request):
         ret_val = {"message" : "Your GET request was received",
-                   "data" : request.data.__str__(),
-                   "post" : request.POST.__str__(),
-                   "get" : request.GET.__str__(),
-                   "query_params" : request.query_params.__str__()}
+                   "the type requested" : request.query_params['type'],
+        }
+        return Response(ret_val , status = status.HTTP_200_OK)
+    
+    def post(self, request):
+        ret_val = {"message" : "Your GET request was received",
+            "data" : request.data.__str__(),
+            "post" : request.POST.__str__(),
+            "get" : request.GET.__str__(),
+            "query_params" : request.query_params.__str__()}
         return Response(ret_val , status = status.HTTP_200_OK)
 
-    # def post(self, request):
+# def post(self, request):
     #     serializer = TodolistSerializer(data = request.data)
     #     ret_val  = { "message" : "data deserialization was successful", }
     #     if not serializer.is_valid():
