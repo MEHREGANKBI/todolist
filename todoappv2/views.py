@@ -107,6 +107,33 @@ class TodolistCRUDView(APIView):
             received_id = int(received_id)
             received_done_status = request.data['done_status']
         except KeyError:
-
-        ret_val = { "message" : "Your PUT request was received" , }
+            ret_val = {'usage_error' : 'Both keys id and done_status are mandatory.'}
+            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+        
+        except ValueError:
+            ret_val = {'usage_error' : 'Invalid value for id.',
+                       'value_received' : request.data['id'].__str__()}
+            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+        
+        # This will allow integer 0 or 1 to be passed as values for the done_status key.
+        done_status_valid_values = [False, True, "true", "false"]
+        if received_done_status not in done_status_valid_values:
+            ret_val = {"usage_error" : "Invalid value for <done_status>. Must be either JSON's true OR false"}
+            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            obj_of_id = get_object_or_404(Todolist, id = received_id)
+            if received_done_status.__str__().lower() == 'true':
+                upate_done_status = True
+            else:
+                upate_done_status = False
+            obj_of_id.done_status = upate_done_status
+            obj_of_id.save()
+        except Http404:
+            ret_val = {'error404' : "The <id> you asked for was not found."}
+            
+    
+        ret_val = { "message" : "Your PUT request was received with no ERRORS" , 
+                   "id": received_id,
+                   "done_status" : received_done_status.__str__()}
         return Response(ret_val , status = status.HTTP_200_OK)
