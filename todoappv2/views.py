@@ -42,14 +42,34 @@ class TodolistCRUDView(APIView):
         return Response(ret_val , status = status.HTTP_200_OK)
     
 
-   def post(self, request):
-    #     serializer = TodolistSerializer(data = request.data)
-    #     ret_val  = { "message" : "data deserialization was successful", }
-    #     if not serializer.is_valid():
-    #         ret_val = serializer.errors
-    #         return Response(ret_val , status = status.HTTP_400_BAD_REQUEST)
-    #     Todolist.objects.create(**serializer.validated_data)
-    #     return Response(ret_val, status = status.HTTP_200_OK)
+    def post(self, request):
+        ret_val = None
+        received_data = request.data
+        # TODO: Try to replace the try except block with a more efficient method.
+        try:
+            temp = received_data['done_status']
+        except KeyError:
+            ret_val = { "usage_error" : 'The key "done_status" must exist!'}
+            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+        
+        # This will allow integer 0 or 1 to be passed as values for the done_status key.
+        done_status_valid_values = [False, True, "true", "false"]
+        if received_data['done_status'] not in done_status_valid_values:
+            ret_val = {"usage_error" : "Invalid value!The key \"done_status\" must be either JSON true OR false"}
+            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+        
+        serialized_data = TodolistSerializer(data=request.data)
+        if not serialized_data.is_valid():
+            ret_val = {"usage_error" : "The following errors were encountered while parsing your data.",
+                       "errors" : serialized_data.errors}
+            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+        
+
+        
+        ret_val = { "success" : "We got past all validations.",
+                   "validated_data" : serialized_data.validated_data}
+        return Response(ret_val, status= status.HTTP_200_OK)
+    
 
     def delete(self, request):
         ret_val = { "message" : "Your DELETE request was received" , }
