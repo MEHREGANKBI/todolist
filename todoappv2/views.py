@@ -64,9 +64,9 @@ class TodolistCRUDView(APIView):
                        "errors" : serialized_data.errors}
             return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
         
-
+        serialized_data.save()
         
-        ret_val = { "success" : "We got past all validations.",
+        ret_val = { "success" : "The following data got past all validations.",
                    "validated_data" : serialized_data.validated_data}
         return Response(ret_val, status= status.HTTP_200_OK)
     
