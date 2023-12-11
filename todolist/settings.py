@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [ '*' ]
 # Application definition
 
 INSTALLED_APPS = [
+    "todoappv3.apps.Todoappv3Config",
     "rest_framework",
     "todoappv2.apps.Todoappv2Config",
     "todoappv1.apps.Todoappv1Config",
