@@ -1,9 +1,6 @@
-#from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-#from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
-#from django.views import View
 from django.http import Http404, JsonResponse
 from rest_framework.views import APIView
 
@@ -53,31 +50,24 @@ class TodolistCRUDView(APIView):
         return Response(ret_val, status= status.HTTP_200_OK)
     
 
-    def delete(self, request):
-        ret_val = None
-        received_data = request.data
-        try:
-            received_id = received_data['id']
-            received_id = int(received_id)
-            obj_of_id = get_object_or_404(Todolist, id = received_id)
-            obj_of_id.delete()
-        except(KeyError):
-            ret_val = { "usage_error" : "key <id> is mandatory."}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-        except(ValueError):
-            ret_val = {"usage_error" : "invalid value for key <id>",
-                       "value_received" : received_data['id'].__str__()}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-        except(Http404):
-            ret_val = { "error404": "The id received is not found"}
-            return Response(ret_val, status= status.HTTP_404_NOT_FOUND)
-
-
+    def delete(self, request, id_param):
+        response_status = None
         
+        try:
+            deletion_obj = get_object_or_404(Todolist, id = id_param)
+            deletion_obj.delete()
+            response_dict['result'] = 'SUCCESS!' 
+            response_dict['message'] = 'The deletion was completed without errors!' 
+            response_status = status.HTTP_200_OK
+        
+        except:
+            response_dict['result'] = 'ERROR!'
+            response_dict['message'] = 'Object with the given id was not found!'
+            response_status = status.HTTP_404_NOT_FOUND
 
-        ret_val = { "message" : "Your DELETE request was completed with no ERRORS" ,
-                   "id" : received_id.__str__() }
-        return Response(ret_val , status = status.HTTP_200_OK)
+
+        return JsonResponse(response_dict, safe= False, status = response_status)
+        
 
     def put(self, request):
         ret_val = None

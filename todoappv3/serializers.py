@@ -18,4 +18,9 @@ class GETTodolistSerializer(serializers.ModelSerializer):
         fields = ['id', 'activity_description']
         read_only_fields = ['id', 'activity_description']
 
-        
+
+# class DELETETodolistSerializer(serializers.ModelSerializer):
+#     id = serializers.PrimaryKeyRelatedField(unique = True)
+#     class Meta:
+#         model = Todolist
+#         fields = ['id']
