@@ -6,5 +6,6 @@ class TodolistSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Todolist
-        fields = [ 'activity_description' , 'done_status']
+        fields = [ 'id' , 'activity_description' , 'done_status']
+        read_only_fields = ['id']
 

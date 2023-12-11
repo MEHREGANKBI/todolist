@@ -24,17 +24,18 @@ class TodolistCRUDView(APIView):
         if retrieval_type == "ALL" :
             serialized_objects = TodolistSerializer(Todolist.objects.all(), many = True)
             ret_val = { "retrieval_type" : "ALL",
-                       "payload" : [ item['activity_description'] for item in serialized_objects.data]
+                       #"payload" : [ item['activity_description'] for item in serialized_objects.data]
+                       "payload" : serialized_objects.data
             }
         elif retrieval_type == "DONE" :
             serialized_objects = TodolistSerializer(Todolist.objects.filter(done_status = True), many = True)
             ret_val = {"retrieval_type" : "DONE",
-                       "payload" : [ item['activity_description'] for item in serialized_objects.data],
+                       "payload" : [ {"id" : item['id'] , "activity_description" : item['activity_description'] }for item in serialized_objects.data],
             }
         elif retrieval_type == "UNDONE" :
             serialized_objects = TodolistSerializer(Todolist.objects.filter(done_status = False), many = True)
             ret_val = { "retrieval_type" : "UNDONE",
-                       "payload" : [ item['activity_description'] for item in serialized_objects.data]
+                        "payload" : [ {"id" : item['id'] , "activity_description" : item['activity_description'] }for item in serialized_objects.data]
             }
         else :
             ret_val = {"usage_error" : "The value entered for \"type\" is invalid!",
