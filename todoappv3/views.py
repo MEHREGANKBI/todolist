@@ -1,49 +1,27 @@
 #from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from .models import Todolist
 #from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
 #from django.views import View
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from rest_framework.views import APIView
-from .serializers import TodolistSerializer
+
+from .models import Todolist
+from .serializers import *
+from .responses import response_dict
+from .view_helpers import get_todolist_data
 
 class TodolistCRUDView(APIView):
 
-    def get(self, request):
-        model_objects = None
-        serialized_objects = None
-        ret_val = None
-        retrieval_type = request.query_params.dict().get('type', 0)
-        if not retrieval_type:
-            ret_val = { "usage_error" : "Required key \"type\" was not found in the request!"}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-        
-        retrieval_type = retrieval_type.strip().upper()
-        if retrieval_type == "ALL" :
-            serialized_objects = TodolistSerializer(Todolist.objects.all(), many = True)
-            ret_val = { "retrieval_type" : "ALL",
-                       #"payload" : [ item['activity_description'] for item in serialized_objects.data]
-                       "payload" : serialized_objects.data
-            }
-        elif retrieval_type == "DONE" :
-            serialized_objects = TodolistSerializer(Todolist.objects.filter(done_status = True), many = True)
-            ret_val = {"retrieval_type" : "DONE",
-                       "payload" : [ {"id" : item['id'] , "activity_description" : item['activity_description'] }for item in serialized_objects.data],
-            }
-        elif retrieval_type == "UNDONE" :
-            serialized_objects = TodolistSerializer(Todolist.objects.filter(done_status = False), many = True)
-            ret_val = { "retrieval_type" : "UNDONE",
-                        "payload" : [ {"id" : item['id'] , "activity_description" : item['activity_description'] }for item in serialized_objects.data]
-            }
-        else :
-            ret_val = {"usage_error" : "The value entered for \"type\" is invalid!",
-                       "value received" : str(retrieval_type)}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-             
+    def get(self, request, type_param):
+        type_param = type_param.strip().upper()
+        response_status = None
 
-        return Response(ret_val , status = status.HTTP_200_OK)
+        response_dict['result'], response_dict['message'], response_status = get_todolist_data(type_param) # type: ignore
+        
+        return JsonResponse(response_dict, safe= False, status= response_status) 
+
     
 
     def post(self, request):
