@@ -6,7 +6,7 @@ app_name="todoappv3"
 
 urlpatterns = [
     path("", views.TodolistCRUDView.as_view(), name="root"),
-    path("<int:id_param>/", views.TodolistCRUDView.as_view(), name = "delete_view"),
-    path("<str:type_param>/", views.TodolistCRUDView.as_view(), name = "retrieval_view"),
-    
+    # The following paths must only be used with their respective functions i.e get and delete, respectively.
+    path("get/<str:type_param>/", views.TodolistCRUDView.as_view(), name = "retrieval_view"),
+    path("delete/<int:id_param>/", views.TodolistCRUDView.as_view(), name = "delete_view"),
     ]
