@@ -29,3 +29,10 @@ class PUTTodolistSerializer(serializers.ModelSerializer):
         model = Todolist
         fields = ['id','done_status']
 
+
+class DELETETodolistSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required = True, min_value = 0,
+                                   validators = [todolist_id_exists_validator])
+    class Meta:
+        model = Todolist
+        fields = ['id']

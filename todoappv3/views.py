@@ -47,18 +47,32 @@ class TodolistCRUDView(APIView):
 
     def delete(self, request, id_param):
         response_status = None
-        
-        try:
-            deletion_obj = get_object_or_404(Todolist, id = id_param)
-            deletion_obj.delete()
-            response_dict['result'] = 'SUCCESS!' 
+
+        deserialized_data = DELETETodolistSerializer(data = {'id' : id_param}) # type: ignore
+
+        if deserialized_data.is_valid():
+            del_obj = Todolist.objects.get(id = deserialized_data.validated_data['id']) # type: ignore
+            del_obj.delete()
+            response_dict['result'] = 'SUCCESS!'
             response_dict['message'] = 'The deletion was completed without errors!' 
             response_status = status.HTTP_200_OK
-        
-        except Http404:
+
+        else:
             response_dict['result'] = 'ERROR!'
             response_dict['message'] = 'Object with the given id was not found!'
-            response_status = status.HTTP_404_NOT_FOUND
+            response_status = status.HTTP_404_NOT_FOUND            
+        
+        # try:
+        #     deletion_obj = get_object_or_404(Todolist, id = id_param)
+        #     deletion_obj.delete()
+        #     response_dict['result'] = 'SUCCESS!'
+        #     response_dict['message'] = 'The deletion was completed without errors!' 
+        #     response_status = status.HTTP_200_OK
+        
+        # except Http404:
+        #     response_dict['result'] = 'ERROR!'
+        #     response_dict['message'] = 'Object with the given id was not found!'
+        #     response_status = status.HTTP_404_NOT_FOUND
 
 
         return JsonResponse(response_dict, safe= False, status = response_status)
