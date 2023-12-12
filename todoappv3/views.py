@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.response import Response
 from django.http import Http404, JsonResponse
 from rest_framework.views import APIView
 
@@ -8,6 +7,7 @@ from .models import Todolist
 from .serializers import *
 from .responses import response_dict
 from .view_helpers import get_todolist_data
+
 
 class TodolistCRUDView(APIView):
 
@@ -39,7 +39,7 @@ class TodolistCRUDView(APIView):
 
         else:
             response_dict['result'] = "ERROR!"
-            response_dict['message'] = serialized_data.errors
+            response_dict['message'] = serialized_data.errors # type: ignore
             response_status = status.HTTP_400_BAD_REQUEST
 
         return JsonResponse(response_dict, safe= False, status =response_status)
@@ -55,7 +55,7 @@ class TodolistCRUDView(APIView):
             response_dict['message'] = 'The deletion was completed without errors!' 
             response_status = status.HTTP_200_OK
         
-        except:
+        except Http404:
             response_dict['result'] = 'ERROR!'
             response_dict['message'] = 'Object with the given id was not found!'
             response_status = status.HTTP_404_NOT_FOUND
@@ -65,39 +65,22 @@ class TodolistCRUDView(APIView):
         
 
     def put(self, request):
-        ret_val = None
-        try:
-            received_id = request.data['id']
-            received_id = int(received_id)
-            received_done_status = request.data['done_status']
-        except KeyError:
-            ret_val = {'usage_error' : 'Both keys id and done_status are mandatory.'}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
+        response_status = None
+
+        deserialized_data = PUTTodolistSerializer(data= request.data)
+
+        if deserialized_data.is_valid():
+            # since both id and done_status are validated, we won't face errors in the 3 following lines.
+            update_obj = Todolist.objects.get(id=deserialized_data.validated_data['id']) # type: ignore
+            update_obj.done_status = deserialized_data.validated_data['done_status'] # type: ignore
+            update_obj.save()
+            response_dict['result'] = 'SUCCESS!'
+            response_dict['message'] = 'Your update request was completed without errors.'
+            response_status = status.HTTP_200_OK
+
+        else:
+            response_dict['result'] = 'ERROR!'
+            response_dict['message'] = deserialized_data.errors # type: ignore
+            response_status = status.HTTP_400_BAD_REQUEST
         
-        except ValueError:
-            ret_val = {'usage_error' : 'Invalid value for id.',
-                       'value_received' : request.data['id'].__str__()}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-        
-        # This will allow integer 0 or 1 to be passed as values for the done_status key.
-        done_status_valid_values = [False, True, "true", "false"]
-        if received_done_status not in done_status_valid_values:
-            ret_val = {"usage_error" : "Invalid value for <done_status>. Must be either JSON's true OR false"}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            obj_of_id = get_object_or_404(Todolist, id = received_id)
-            if received_done_status.__str__().lower() == 'true':
-                upate_done_status = True
-            else:
-                upate_done_status = False
-            obj_of_id.done_status = upate_done_status
-            obj_of_id.save()
-        except Http404:
-            ret_val = {'error404' : "The <id> you asked for was not found."}
-            
-    
-        ret_val = { "message" : "Your PUT request was received with no ERRORS" , 
-                   "id": received_id,
-                   "done_status" : received_done_status.__str__()}
-        return Response(ret_val , status = status.HTTP_200_OK)
+        return JsonResponse(response_dict, safe= False, status= response_status)
