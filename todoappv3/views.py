@@ -22,32 +22,27 @@ class TodolistCRUDView(APIView):
     
 
     def post(self, request):
-        ret_val = None
-        received_data = request.data
-        # TODO: Try to replace the try except block with a more efficient method.
-        try:
-            temp = received_data['done_status']
-        except KeyError:
-            ret_val = { "usage_error" : 'The key "done_status" must exist!'}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-        
-        # This will allow integer 0 or 1 to be passed as values for the done_status key.
-        done_status_valid_values = [False, True, "true", "false"]
-        if received_data['done_status'] not in done_status_valid_values:
-            ret_val = {"usage_error" : "Invalid value!The key \"done_status\" must be either JSON true OR false"}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-        
-        serialized_data = TodolistSerializer(data=request.data)
-        if not serialized_data.is_valid():
-            ret_val = {"usage_error" : "The following errors were encountered while parsing your data.",
-                       "errors" : serialized_data.errors}
-            return Response(ret_val, status= status.HTTP_400_BAD_REQUEST)
-        
-        serialized_data.save()
-        
-        ret_val = { "success" : "The following data got past all validations.",
-                   "validated_data" : serialized_data.validated_data}
-        return Response(ret_val, status= status.HTTP_200_OK)
+        response_status = None
+
+        # If the following json is not valid, it'll send an automatic response, the pattern 
+        # of which is out of my control and is different from my unified response pattern.
+        # Possible solutions: 
+        # 1: validate the json before handing it to the serializer which defeats the purpose of using serializers.
+        # 2: use try except on the parsing line which apparently degrades performance.
+        serialized_data = TodolistSerializer(data= request.data)
+
+        if serialized_data.is_valid():
+            serialized_data.save()
+            response_dict['result'] =  'SUCCESS!'
+            response_dict['message'] = 'Your composition request was completed without errors!'
+            response_status = status.HTTP_200_OK
+
+        else:
+            response_dict['result'] = "ERROR!"
+            response_dict['message'] = serialized_data.errors
+            response_status = status.HTTP_400_BAD_REQUEST
+
+        return JsonResponse(response_dict, safe= False, status =response_status)
     
 
     def delete(self, request, id_param):
