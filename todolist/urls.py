@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
+    path("todoappv4/", include("todoappv4.urls"), name = "todoappv4urls"),
     path("todoappv3/", include("todoappv3.urls"), name = "todoappv3urls"),
     path("todoappv2/", include("todoappv2.urls"), name = "todoappv2urls"),
     path("todoappv1/", include("todoappv1.urls"), name = "todoappv1urls"),
