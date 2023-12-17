@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404
-from .models import Todolist
 from rest_framework import serializers
 
 def todolist_id_exists_validator(id):

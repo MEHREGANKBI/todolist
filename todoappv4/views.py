@@ -3,7 +3,6 @@ from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.views import APIView
 
-from .models import Todolist
 from .serializers import *
 from .responses import response_dict
 from .view_helpers import get_todolist_data
@@ -12,12 +11,17 @@ from .view_helpers import get_todolist_data
 class TodolistCRUDView(APIView):
 
     def get(self, request, type_param):
-        type_param = type_param.strip().upper()
-        response_status = None
+        result = request.headers.get('custom-auth', None)
+        if result == None:
+            result = "empty"
+        return JsonResponse({'result': result}, safe= False, status = status.HTTP_200_OK)
 
-        response_dict['result'], response_dict['message'], response_status = get_todolist_data(type_param) # type: ignore
+        # type_param = type_param.strip().upper()
+        # response_status = None
+
+        # response_dict['result'], response_dict['message'], response_status = get_todolist_data(type_param) # type: ignore
         
-        return JsonResponse(response_dict, safe= False, status= response_status) 
+        # return JsonResponse(response_dict, safe= False, status= response_status) 
 
     
 
@@ -98,3 +102,10 @@ class TodolistCRUDView(APIView):
             response_status = status.HTTP_400_BAD_REQUEST
         
         return JsonResponse(response_dict, safe= False, status= response_status)
+
+
+
+class CustomAuth(APIView):
+    
+    def post(self,request):
+        pass
