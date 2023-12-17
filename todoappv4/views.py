@@ -2,10 +2,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.views import APIView
+from base64 import b64decode
 
 from .serializers import *
 from .responses import response_dict
-from .view_helpers import get_todolist_data
+from .view_helpers import *
 
 
 class TodolistCRUDView(APIView):
@@ -107,6 +108,52 @@ class TodolistCRUDView(APIView):
 
 
 class CustomAuth(APIView):
-    
-    def post(self,request):
+
+    def signin(self,request):
+        b64_userpass = request.headers.get('custom-auth', None)
+
+        combo_is_valid, payload = validate_b64_userpass(b64_userpass)
+        if combo_is_valid :
+            username, password = payload
+            is_authenticated, auth_payload = authenticate_userpass(username,password)
+            if is_authenticated:
+                response_status = status.HTTP_200_OK
+                response_message, response_result = auth_payload
+            else:
+                response_status = status.HTTP_404_NOT_FOUND
+                response_message, response_result = auth_payload
+            
+        else:
+            response_status = status.HTTP_400_BAD_REQUEST
+            response_message, response_result = payload   
+
+        return response_message, response_result, response_status         
+
+
+
+
+    def signup(self, request):
         pass
+    
+
+
+    def post(self,request):
+        response_status = None
+        path_requested = request.path
+        signup_path = '/todoappv4/signup/'
+        signin_path = '/todoappv4/signin/'
+
+
+        if path_requested == signin_path:
+            response_dict['message'], response_dict['result'], response_status = self.signin(request)
+
+        elif path_requested == signup_path:
+            response_dict['message'], response_dict['result'], response_status = self.signup(request)
+
+        else:
+            response_dict['message'] = 'ERROR...'
+            response_dict['result'] = 'Invalid URL.'
+            response_status = status.HTTP_404_NOT_FOUND
+
+
+        return JsonResponse(response_dict, safe= False, status = response_status)
