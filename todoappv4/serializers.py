@@ -2,14 +2,13 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from .validators import *
+from .models import *
 
-
-# class TodolistSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     
-#     class Meta:
-#         model = Todolist
-#         fields = [ 'id' , 'activity_description' , 'done_status']
-#         read_only_fields = ['id']
+    class Meta:
+        model = User
+        fields = [ 'username' , 'password' ]
 
 
 
