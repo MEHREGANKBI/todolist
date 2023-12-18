@@ -9,21 +9,29 @@ from .responses import response_dict
 from .view_helpers import *
 
 
-class TodolistCRUDView(APIView):
-   pass
+class TaskView(APIView):
 
-#     def get(self, request, type_param):
-#         result = request.headers.get('custom-auth', None)
-#         if result == None:
-#             result = "empty"
-#         return JsonResponse({'result': result}, safe= False, status = status.HTTP_200_OK)
+    def get(self, request, type_param):
+        type_param = type_param.strip().upper()
+        response_status = None
 
-#         # type_param = type_param.strip().upper()
-#         # response_status = None
+        token_is_valid, username = token_authenticate(request.headers)
+        if token_is_valid and user_exists(username):
+            response_dict['message'], response_dict['result'], response_status = get_user_tasks(username,type_param)
 
-#         # response_dict['result'], response_dict['message'], response_status = get_todolist_data(type_param) # type: ignore
+
+        elif token_is_valid:
+            response_status = status.HTTP_404_NOT_FOUND
+            response_dict['message'] = 'ERROR...'
+            response_dict['result'] = 'User not found.'
+
+        else:
+            response_status = status.HTTP_401_UNAUTHORIZED
+            response_dict['message'] = 'ERROR...'
+            response_dict['result'] = 'You need to sign in.'
         
-#         # return JsonResponse(response_dict, safe= False, status= response_status) 
+        return JsonResponse(response_dict, safe= False, status= response_status)
+
 
     
 

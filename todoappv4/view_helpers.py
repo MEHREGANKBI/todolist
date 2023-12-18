@@ -18,6 +18,17 @@ def user_exists(username):
         return False
     else:
         return True
+    
+
+
+def token_authenticate(request_headers):
+    jwt_token = request_headers.get('jwt-token', None)
+    try:   
+        verified_token = jwt.decode(jwt= jwt_token, key= jwt_secret, algorithms= ['HS256',])
+    except:
+        return False, None
+    else:
+        return True, verified_token['sub']
         
 
 
