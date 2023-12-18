@@ -2,10 +2,22 @@ from rest_framework import status
 from base64 import b64decode
 from django.shortcuts import get_object_or_404
 from hashlib import sha512
+import jwt
+from datetime import datetime
+
 
 from .serializers import *
 from .models import User
-from .secrets import salt
+from .secrets import salt, jwt_secret
+
+def create_jwt_token(username):
+    # 24hrs
+    expiry_unix_epoch = int(datetime.utcnow().timestamp()) + 86400
+    jwt_payload = { 'sub' : username,
+                    'exp' : expiry_unix_epoch }
+    
+    jwt_token = jwt.encode(payload= jwt_payload, key= jwt_secret, algorithm= 'HS256')
+    return jwt_token
 
 def validate_b64_userpass(b64_userpass):
     try:
@@ -29,7 +41,8 @@ def authenticate_userpass(username,password):
         salted_password = salt + password
         password_hash = sha512(bytes(salted_password, encoding = 'utf-8')).hexdigest()
         if user_obj.password == password_hash: 
-            return True, ('SUCCESS...' , 'This is a jwt token')
+            jwt_token = create_jwt_token(username)
+            return True, ('SUCCESS...' , jwt_token)
         else:
             return False, ('ERROR...', 'Invalid username or password.')
 
