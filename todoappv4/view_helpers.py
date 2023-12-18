@@ -10,41 +10,17 @@ from .serializers import *
 from .models import User
 from .secrets import salt, jwt_secret
 
-def create_jwt_token(username):
-    # 24hrs
-    expiry_unix_epoch = int(datetime.utcnow().timestamp()) + 86400
-    jwt_payload = { 'sub' : username,
-                    'exp' : expiry_unix_epoch }
-    
-    jwt_token = jwt.encode(payload= jwt_payload, key= jwt_secret, algorithm= 'HS256')
-    return jwt_token
 
-def validate_b64_userpass(b64_userpass):
+def user_exists(username):
     try:
-        validated_userpass = b64decode(bytes(b64_userpass, encoding = 'utf-8'), validate= True).decode(encoding='utf-8') 
-        delimiter_idx = validated_userpass.index(':')
+        user_obj = get_object_or_404(User, username= username)
     except:
-        return False, ('ERROR...', 'Invalid auth header.')
+        return False
     else:
-        username = validated_userpass[:delimiter_idx]
-        password = validated_userpass[delimiter_idx + 1 :]
-        return True, (username, password)
+        return True
+        
 
 
-
-def authenticate_userpass(username,password):
-    try:
-        user_obj = get_object_or_404(User,username = username)
-    except:
-        return False, ('ERROR...', 'Invalid username or password.')
-    else:
-        salted_password = salt + password
-        password_hash = sha512(bytes(salted_password, encoding = 'utf-8')).hexdigest()
-        if user_obj.password == password_hash: 
-            jwt_token = create_jwt_token(username)
-            return True, ('SUCCESS...' , jwt_token)
-        else:
-            return False, ('ERROR...', 'Invalid username or password.')
 
 
 

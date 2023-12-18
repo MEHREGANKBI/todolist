@@ -10,7 +10,7 @@ from .view_helpers import *
 
 
 class TodolistCRUDView(APIView):
-    pass
+   pass
 
 #     def get(self, request, type_param):
 #         result = request.headers.get('custom-auth', None)
@@ -109,13 +109,80 @@ class TodolistCRUDView(APIView):
 
 class CustomAuth(APIView):
 
+    def create_jwt_token(self,username):
+        # 24hrs
+        expiry_unix_epoch = int(datetime.utcnow().timestamp()) + 86400
+        jwt_payload = { 'sub' : username,
+                        'exp' : expiry_unix_epoch }
+        
+        jwt_token = jwt.encode(payload= jwt_payload, key= jwt_secret, algorithm= 'HS256')
+        return jwt_token
+    
+    def create_new_user(self,username,password):
+        response_status = None
+        response_message = None
+        response_result = None
+
+        salted_password = salt + password
+        hashed_password = sha512(bytes(salted_password, encoding = 'utf-8')).hexdigest()
+        new_user = { 'username' : username,
+                     'password' : hashed_password}
+        
+        deserialized_user = UserSerializer(data= new_user)
+        if deserialized_user.is_valid():
+            deserialized_user.save()
+            jwt_token = self.create_jwt_token(username)
+            response_status = status.HTTP_200_OK
+            response_message = 'SUCCESS...'
+            response_result = jwt_token
+
+        else:
+            response_status = status.HTTP_400_BAD_REQUEST
+            response_message = 'ERROR...'
+            response_result = deserialized_user.errors
+
+        return response_message, response_result, response_status
+
+
+
+    def authenticate_userpass(self,username,password):
+        try:
+            user_obj = get_object_or_404(User,username = username)
+        except:
+            return False, ('ERROR...', 'Invalid username or password.')
+        else:
+            salted_password = salt + password
+            password_hash = sha512(bytes(salted_password, encoding = 'utf-8')).hexdigest()
+            if user_obj.password == password_hash: 
+                jwt_token = self.create_jwt_token(username)
+                return True, ('SUCCESS...' , jwt_token)
+            else:
+                return False, ('ERROR...', 'Invalid username or password.')
+            
+
+    def validate_b64_userpass(self, b64_userpass):
+        # TODO: add more checks to make sure username or password don't contain weird characters.
+        try:
+            validated_userpass = b64decode(bytes(b64_userpass, encoding = 'utf-8'), validate= True).decode(encoding='utf-8') 
+            delimiter_idx = validated_userpass.index(':')
+        except:
+            return False, ('ERROR...', 'Invalid auth header.')
+        else:
+            username = validated_userpass[:delimiter_idx]
+            password = validated_userpass[delimiter_idx + 1 :]
+            return True, (username, password)
+
+
     def signin(self,request):
+        response_status = None
+        response_message = None
+        response_result = None
         b64_userpass = request.headers.get('custom-auth', None)
 
-        combo_is_valid, payload = validate_b64_userpass(b64_userpass)
+        combo_is_valid, payload = self.validate_b64_userpass(b64_userpass)
         if combo_is_valid :
             username, password = payload
-            is_authenticated, auth_payload = authenticate_userpass(username,password)
+            is_authenticated, auth_payload = self.authenticate_userpass(username,password)
             if is_authenticated:
                 response_status = status.HTTP_200_OK
                 response_message, response_result = auth_payload
@@ -133,8 +200,25 @@ class CustomAuth(APIView):
 
 
     def signup(self, request):
-        pass
-    
+        response_status = None
+        response_message = None
+        response_result = None
+        b64_userpass = request.headers.get('custom-auth', None)
+
+        combo_is_valid, payload = self.validate_b64_userpass(b64_userpass)
+        if combo_is_valid:
+            username, password = payload
+            
+            response_message, response_result, response_status = self.create_new_user(username, password)
+
+
+        else:
+            response_status = status.HTTP_400_BAD_REQUEST
+            response_message, response_result = payload
+
+        return response_message, response_result, response_status
+
+
 
 
     def post(self,request):
@@ -148,7 +232,7 @@ class CustomAuth(APIView):
             response_dict['message'], response_dict['result'], response_status = self.signin(request)
 
         elif path_requested == signup_path:
-            response_dict['message'], response_dict['result'], response_status = self.signup(request)
+            response_dict['message'], response_dict['result'], response_status = self.signup(request) # type: ignore 
 
         else:
             response_dict['message'] = 'ERROR...'
