@@ -40,7 +40,7 @@ class POSTSerializer(serializers.Serializer):
     def save(self, username):
         user_obj = User.objects.get(username= username)
         validated_data = self.validated_data
-        user_tag = validated_data.get('tag', None)
+        user_tag = validated_data.get('tag', None) # type: ignore
         validated_data['deadline_at'] = datetime.fromtimestamp(validated_data['deadline_at'], tz= timezone.utc) # type: ignore
 
         if user_tag == None or user_tag == '':
