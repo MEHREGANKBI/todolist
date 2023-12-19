@@ -100,37 +100,36 @@ class TaskView(APIView):
         return JsonResponse(response_dict, safe= False, status =response_status)
     
 
-#     def delete(self, request, id_param):
-#         response_status = None
+    def delete(self, request, id_param):
+        response_status = None
 
-#         deserialized_data = DELETETodolistSerializer(data = {'id' : id_param}) # type: ignore
-
-#         if deserialized_data.is_valid():
-#             del_obj = Todolist.objects.get(id = deserialized_data.validated_data['id']) # type: ignore
-#             del_obj.delete()
-#             response_dict['result'] = 'SUCCESS!'
-#             response_dict['message'] = 'The deletion was completed without errors!' 
-#             response_status = status.HTTP_200_OK
-
-#         else:
-#             response_dict['result'] = 'ERROR!'
-#             response_dict['message'] = 'Object with the given id was not found!'
-#             response_status = status.HTTP_404_NOT_FOUND            
+        token_is_valid, username = token_authenticate(request.headers)
+        if token_is_valid and user_exists(username) and task_exists(id_param):
+            # now we check if the task with the given id is owned by the user whose username is in the token.
+            if user_owns_task(username, id_param):
+                task_obj = Task.objects.get(id = id_param)
+                task_obj.delete()
+                response_status = status.HTTP_200_OK
+                response_dict['message'] = 'SUCCESS...'
+                response_dict['result'] = 'The task was successfully removed.'
+            else:
+                response_status = status.HTTP_403_FORBIDDEN
+                response_dict['message'] = 'ERROR...'
+                response_dict['result'] = 'You do not have the permission to complete this action.'
         
-#         # try:
-#         #     deletion_obj = get_object_or_404(Todolist, id = id_param)
-#         #     deletion_obj.delete()
-#         #     response_dict['result'] = 'SUCCESS!'
-#         #     response_dict['message'] = 'The deletion was completed without errors!' 
-#         #     response_status = status.HTTP_200_OK
+        elif token_is_valid and user_exists(username):
+            response_status = status.HTTP_404_NOT_FOUND
+            response_dict['message'] = 'ERROR...'
+            response_dict['result'] = 'Task not found.'
+
+        else:
+            response_status = status.HTTP_401_UNAUTHORIZED
+            response_dict['message'] = 'ERROR...'
+            response_dict['result']  = 'You need to sign in.'       
         
-#         # except Http404:
-#         #     response_dict['result'] = 'ERROR!'
-#         #     response_dict['message'] = 'Object with the given id was not found!'
-#         #     response_status = status.HTTP_404_NOT_FOUND
 
 
-#         return JsonResponse(response_dict, safe= False, status = response_status)
+        return JsonResponse(response_dict, safe= False, status = response_status)
         
 
 #     def put(self, request):
