@@ -53,10 +53,10 @@ class TaskView(APIView):
             response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(username,type_param) # type: ignore
 
 
-        elif token_is_valid:
-            response_status = status.HTTP_404_NOT_FOUND
-            response_dict['message'] = 'ERROR...'
-            response_dict['result'] = 'User not found.'
+        # elif token_is_valid:
+        #     response_status = status.HTTP_404_NOT_FOUND
+        #     response_dict['message'] = 'ERROR...'
+        #     response_dict['result'] = 'User not found.'
 
         else:
             response_status = status.HTTP_401_UNAUTHORIZED
@@ -71,6 +71,14 @@ class TaskView(APIView):
     def post(self, request):
         response_status = None
 
+        token_is_valid, username = token_authenticate(request.headers)
+        if token_is_valid and user_exists(username):
+            pass
+        else:
+            response_status = status.HTTP_401_UNAUTHORIZED
+            response_dict['message'] = 'ERROR...'
+            response_dict['result'] = 'You need to sign in.'
+            return JsonResponse(response_dict, safe= False, status = response_status)
         # If the following json is not valid, it'll send an automatic response, the pattern 
         # of which is out of my control and is different from my unified response pattern.
         # Possible solutions: 
@@ -79,14 +87,14 @@ class TaskView(APIView):
         deserialized_data = POSTSerializer(data= request.data)
 
         if deserialized_data.is_valid():
-            #deserialized_data.save()
-            response_dict['result'] =  'SUCCESS!'
-            response_dict['message'] = 'Your composition request was completed without errors!'
+            save_status = deserialized_data.save(username= username)
+            response_dict['message'] =  'SUCCESS!'
+            response_dict['result'] = save_status # type: ignore
             response_status = status.HTTP_200_OK
 
         else:
-            response_dict['result'] = "ERROR!"
-            response_dict['message'] = serialized_data.errors # type: ignore
+            response_dict['message'] = "ERROR!"
+            response_dict['result'] = deserialized_data.errors # type: ignore
             response_status = status.HTTP_400_BAD_REQUEST
 
         return JsonResponse(response_dict, safe= False, status =response_status)
