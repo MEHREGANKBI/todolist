@@ -11,13 +11,46 @@ from .view_helpers import *
 
 class TaskView(APIView):
 
+    def get_user_tasks(self,username, type_param):
+        response_status = None
+        response_message = None
+        response_result = None
+
+        user_id = User.objects.get(username = username).id # type: ignore
+        user_queryset = Task.objects.filter(User_id = user_id).select_related('Tag_id', 'User_id')
+
+        if type_param == 'ALL':
+            pass
+        elif type_param == 'DONE':
+            user_queryset = user_queryset.filter(is_complete = True)
+        elif type_param == 'UNDONE':
+            user_queryset = user_queryset.filter(is_complete = False)
+        else:
+            response_status = status.HTTP_400_BAD_REQUEST
+            response_message = 'ERROR...'
+            response_result = 'Invalid filter.'
+            return response_message, response_result, response_status
+
+        if user_queryset.exists():
+            serilized_user_data = TaskGETSerializer(user_queryset, many = True)
+            response_result = serilized_user_data.data
+            response_status = status.HTTP_200_OK
+            response_message = 'SUCCESS...'
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+            response_message = 'ERROR...'
+            response_result = 'You currently don\'t have any tasks.'
+
+        return response_message, response_result, response_status
+
+
     def get(self, request, type_param):
         type_param = type_param.strip().upper()
         response_status = None
 
         token_is_valid, username = token_authenticate(request.headers)
         if token_is_valid and user_exists(username):
-            response_dict['message'], response_dict['result'], response_status = get_user_tasks(username,type_param)
+            response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(username,type_param) # type: ignore
 
 
         elif token_is_valid:
@@ -35,28 +68,28 @@ class TaskView(APIView):
 
     
 
-#     def post(self, request):
-#         response_status = None
+    def post(self, request):
+        response_status = None
 
-#         # If the following json is not valid, it'll send an automatic response, the pattern 
-#         # of which is out of my control and is different from my unified response pattern.
-#         # Possible solutions: 
-#         # 1: validate the json before handing it to the serializer which defeats the purpose of using serializers.
-#         # 2: use try except on the parsing line which apparently degrades performance.
-#         serialized_data = TodolistSerializer(data= request.data)
+        # If the following json is not valid, it'll send an automatic response, the pattern 
+        # of which is out of my control and is different from my unified response pattern.
+        # Possible solutions: 
+        # 1: validate the json before handing it to the serializer which defeats the purpose of using serializers.
+        # 2: use try except on the parsing line which apparently degrades performance.
+        deserialized_data = POSTSerializer(data= request.data)
 
-#         if serialized_data.is_valid():
-#             serialized_data.save()
-#             response_dict['result'] =  'SUCCESS!'
-#             response_dict['message'] = 'Your composition request was completed without errors!'
-#             response_status = status.HTTP_200_OK
+        if deserialized_data.is_valid():
+            #deserialized_data.save()
+            response_dict['result'] =  'SUCCESS!'
+            response_dict['message'] = 'Your composition request was completed without errors!'
+            response_status = status.HTTP_200_OK
 
-#         else:
-#             response_dict['result'] = "ERROR!"
-#             response_dict['message'] = serialized_data.errors # type: ignore
-#             response_status = status.HTTP_400_BAD_REQUEST
+        else:
+            response_dict['result'] = "ERROR!"
+            response_dict['message'] = serialized_data.errors # type: ignore
+            response_status = status.HTTP_400_BAD_REQUEST
 
-#         return JsonResponse(response_dict, safe= False, status =response_status)
+        return JsonResponse(response_dict, safe= False, status =response_status)
     
 
 #     def delete(self, request, id_param):

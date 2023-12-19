@@ -5,19 +5,42 @@ from .validators import *
 from .models import *
 
 class UserSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = User
         fields = [ 'username' , 'password' ]
 
+class UserGETSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [ 'username' ]
 
+class TagGETSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['tag']
 
-# class GETTodolistSerializer(serializers.ModelSerializer):
+    
+class TaskGETSerializer(serializers.ModelSerializer):
+    Tag_id = TagGETSerializer()
+    User_id = UserGETSerializer()
+    class Meta:
+        model = Task
+        fields = ['id', 'task', 'is_complete', 'deadline_at', 'Tag_id', 'User_id']
+    
 
-#     class Meta:
-#         model = Todolist
-#         fields = ['id', 'activity_description']
-#         read_only_fields = ['id', 'activity_description']
+class TaskPOSTSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ['task', 'is_complete', 'deadline_']
+
+class POSTSerializer(serializers.Serializer):
+    Tag_id = TagGETSerializer()
+    User_id = UserGETSerializer()
+
+    task = TaskPOSTSerializer()
+    is_complete = TaskPOSTSerializer()
+    deadline_at = TaskPOSTSerializer()
+
 
 
 # class PUTTodolistSerializer(serializers.ModelSerializer):

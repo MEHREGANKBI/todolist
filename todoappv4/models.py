@@ -15,7 +15,7 @@ class User(models.Model):
 class Tag(models.Model):
     
 
-    tag = models.CharField(null = False, blank = False, max_length = 16, validators = [
+    tag = models.CharField(null = False, blank = False, unique = True, max_length = 16, validators = [
         validators.MinLengthValidator(2, message='tag name must be at least 2 characters.'),
         validators.MaxLengthValidator(16, message='tag name must be less than 12 characters.'), 
         ])
