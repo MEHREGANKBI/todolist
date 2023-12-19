@@ -63,17 +63,21 @@ class POSTSerializer(serializers.Serializer):
             
         return "Tagful"
 
-# class PUTTodolistSerializer(serializers.ModelSerializer):
-#     id = serializers.IntegerField(required = True, min_value = 0,
-#                                    validators = [todolist_id_exists_validator])
-#     class Meta:
-#         model = Todolist
-#         fields = ['id','done_status']
+
+class PUTTaskSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required = True, min_value = 0, allow_null = False, 
+                                  validators = [task_exists_validator,])
+    
+    def save(self):
+        validated_data = self.validated_data
+        task_obj = Task.objects.get(id = validated_data['id']) # type: ignore
+        task_obj.is_complete = validated_data['is_complete'] # type: ignore
+        task_obj.save()
+        return 'The update process was completed successfully.'
+
+    class Meta:
+        model = Task
+        fields = ['id', 'is_complete']
+    
 
 
-# class DELETETodolistSerializer(serializers.ModelSerializer):
-#     id = serializers.IntegerField(required = True, min_value = 0,
-#                                    validators = [todolist_id_exists_validator])
-#     class Meta:
-#         model = Todolist
-#         fields = ['id']

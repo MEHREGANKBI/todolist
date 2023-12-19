@@ -50,7 +50,7 @@ def token_authenticate(request_headers):
 def user_owns_task(username, task_id):
     user_obj = User.objects.get(username= username)
     task_obj = Task.objects.get(id = task_id)
-    if user_obj.id == task_obj.User_id_id :
+    if user_obj.id == task_obj.User_id_id : # type: ignore
         return True
     else:
         return False
