@@ -1,8 +1,10 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from datetime import datetime, timezone
 
 from .validators import *
 from .models import *
+from .view_helpers import *
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,20 +30,38 @@ class TaskGETSerializer(serializers.ModelSerializer):
         fields = ['id', 'task', 'is_complete', 'deadline_at', 'Tag_id', 'User_id']
     
 
-class TaskPOSTSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = ['task', 'is_complete', 'deadline_']
-
 class POSTSerializer(serializers.Serializer):
-    Tag_id = TagGETSerializer()
-    User_id = UserGETSerializer()
+    tag = serializers.CharField(required = False, allow_null = True, allow_blank = True, max_length=16, min_length=2)
 
-    task = TaskPOSTSerializer()
-    is_complete = TaskPOSTSerializer()
-    deadline_at = TaskPOSTSerializer()
+    task = serializers.CharField(required = True, allow_null = False, allow_blank = False, max_length = 128, min_length =4)
+    is_complete = serializers.BooleanField(required= True, allow_null= False)
+    deadline_at = serializers.IntegerField(required = True, allow_null = False, min_value = 0)
 
+    def save(self, username):
+        user_obj = User.objects.get(username= username)
+        validated_data = self.validated_data
+        user_tag = validated_data.get('tag', None)
+        validated_data['deadline_at'] = datetime.fromtimestamp(validated_data['deadline_at'], tz= timezone.utc) # type: ignore
 
+        if user_tag == None or user_tag == '':
+            task_obj = Task(task = validated_data['task'], is_complete = validated_data['is_complete'], # type: ignore
+                            deadline_at = validated_data['deadline_at'], User_id = user_obj) # type: ignore
+            task_obj.save()
+            return "Tagless"
+        else:
+
+            # user has entered a tag that is non-empty. so we check if we need to add the tag to the tag table or not.
+            if not tag_exists(validated_data['tag']): # type: ignore
+                tag_obj = Tag(tag = validated_data['tag']) # type: ignore
+                tag_obj.save()
+            else:
+                tag_obj = Tag.objects.get(tag = validated_data['tag']) # type: ignore
+
+            task_obj = Task(task = validated_data['task'], is_complete = validated_data['is_complete'], # type: ignore
+                            deadline_at = validated_data['deadline_at'], User_id = user_obj, Tag_id = tag_obj) # type: ignore
+            task_obj.save()
+            
+        return "Tagful"
 
 # class PUTTodolistSerializer(serializers.ModelSerializer):
 #     id = serializers.IntegerField(required = True, min_value = 0,

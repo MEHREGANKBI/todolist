@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 from .serializers import *
-from .models import User
+from .models import *
 from .secrets import salt, jwt_secret
 
 
@@ -19,6 +19,14 @@ def user_exists(username):
     else:
         return True
     
+
+def tag_exists(tag):
+    try:
+        tag_obj = get_object_or_404(Tag, tag = tag)
+    except:
+        return False
+    else:
+        return True
 
 
 def token_authenticate(request_headers):
