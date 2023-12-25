@@ -2,8 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from django.contrib.auth import get_user_model
-
+from rest_framework.permissions import IsAuthenticated
 
 from .serializers import *
 from .responses import response_dict
@@ -11,61 +10,47 @@ from .view_helpers import *
 
 
 class TaskView(APIView):
-    pass
+    permission_classes = (IsAuthenticated)
 
-    # def get_user_tasks(self,username, type_param):
-    #     response_status = None
-    #     response_message = None
-    #     response_result = None
+    def get_user_tasks(self,username, type_param):
+        user_obj = get_user_model().objects.get(username = username)
+        user_queryset = Task.objects.filter(User = user_obj).select_related('Tag', 'User')
 
-    #     user_id = User.objects.get(username = username).id # type: ignore
-    #     user_queryset = Task.objects.filter(User_id = user_id).select_related('Tag_id', 'User_id')
+        if type_param == 'ALL':
+            pass
+        elif type_param == 'DONE':
+            user_queryset = user_queryset.filter(is_complete = True)
+        elif type_param == 'UNDONE':
+            user_queryset = user_queryset.filter(is_complete = False)
 
-    #     if type_param == 'ALL':
-    #         pass
-    #     elif type_param == 'DONE':
-    #         user_queryset = user_queryset.filter(is_complete = True)
-    #     elif type_param == 'UNDONE':
-    #         user_queryset = user_queryset.filter(is_complete = False)
-    #     else:
-    #         response_status = status.HTTP_400_BAD_REQUEST
-    #         response_message = 'ERROR...'
-    #         response_result = 'Invalid filter.'
-    #         return response_message, response_result, response_status
+        # now we will check whether or not after the filtering process, we have any data left to send to the client. 
+        if user_queryset.exists():
+            serilized_user_data = TaskGETSerializer(user_queryset, many = True)
+            response_result = serilized_user_data.data
+            response_status = status.HTTP_200_OK
+            response_message = 'SUCCESS...'
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+            response_message = 'ERROR...'
+            response_result = 'You currently don\'t have any tasks.'
 
-    #     if user_queryset.exists():
-    #         serilized_user_data = TaskGETSerializer(user_queryset, many = True)
-    #         response_result = serilized_user_data.data
-    #         response_status = status.HTTP_200_OK
-    #         response_message = 'SUCCESS...'
-    #     else:
-    #         response_status = status.HTTP_404_NOT_FOUND
-    #         response_message = 'ERROR...'
-    #         response_result = 'You currently don\'t have any tasks.'
-
-    #     return response_message, response_result, response_status
+        return response_message, response_result, response_status
 
 
-    # def get(self, request, type_param):
-    #     type_param = type_param.strip().upper()
-    #     response_status = None
+    def get(self, request, type_param):
+        type_param = type_param.strip().upper()
+        valid_type_params = ['ALL', 'DONE', 'UNDONE']
+        response_status = None
+        username = request.user.username
 
-    #     token_is_valid, username = token_authenticate(request.headers)
-    #     if token_is_valid and user_exists(username):
-    #         response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(username,type_param) # type: ignore
+        if type_param in valid_type_params:
+            response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(username,type_param) # type: ignore
+        else:
+            response_dict['message'] = 'ERROR...'
+            response_dict['result'] = 'Invalid filter.'
+            response_status = status.HTTP_400_BAD_REQUEST
 
-
-    #     # elif token_is_valid:
-    #     #     response_status = status.HTTP_404_NOT_FOUND
-    #     #     response_dict['message'] = 'ERROR...'
-    #     #     response_dict['result'] = 'User not found.'
-
-    #     else:
-    #         response_status = status.HTTP_401_UNAUTHORIZED
-    #         response_dict['message'] = 'ERROR...'
-    #         response_dict['result'] = 'You need to sign in.'
-        
-    #     return JsonResponse(response_dict, safe= False, status= response_status)
+        return JsonResponse(response_dict, safe= False, status= response_status)
 
 
     
