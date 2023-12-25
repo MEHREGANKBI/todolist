@@ -9,6 +9,9 @@ class Tag(models.Model):
         validators.MaxLengthValidator(16, message='tag name must be less than 12 characters.'), 
         ])
     
+    def __str__(self):
+        return f'tag={self.tag},id={self.id}' # type: ignore
+    
 
 class Task(models.Model):
     task = models.CharField(null = False, blank = False, max_length = 128, validators= [
@@ -24,3 +27,7 @@ class Task(models.Model):
 
     Tag = models.ForeignKey(Tag, models.SET_NULL, null = True, blank = True) # creates Tag and Tag_id orm fields.
     User = models.ForeignKey(get_user_model(), models.CASCADE, null = False, blank = False)
+
+
+    def __str__(self):
+        return f'task={self.task}, is_complete={self.is_complete},\ndeadline_at={self.deadline_at}, User={self.User}, Tag={self.Tag}' # type: ignore
