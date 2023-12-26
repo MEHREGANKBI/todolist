@@ -72,31 +72,37 @@ class POSTSerializer(serializers.Serializer):
     is_complete = serializers.BooleanField(required= True, allow_null= False)
     deadline_at = serializers.IntegerField(required = True, allow_null = False, min_value = 0)
 
-    def save(self, username):
-        # user_obj = User.objects.get(username= username)
+    def get_tag_or_create_if_not_exists(self,tag):
+        if tag_exists(tag):
+            tag_obj = Tag.objects.get(tag= tag)
+        else:
+            tag_obj = Tag(tag = tag)
+            tag_obj.save()
+
+        return tag_obj
+
+
+    def save(self, user_obj):
         validated_data = self.validated_data
         user_tag = validated_data.get('tag', None) # type: ignore
         validated_data['deadline_at'] = datetime.fromtimestamp(validated_data['deadline_at'], tz= timezone.utc) # type: ignore
 
         if user_tag == None or user_tag == '':
             task_obj = Task(task = validated_data['task'], is_complete = validated_data['is_complete'], # type: ignore
-                            deadline_at = validated_data['deadline_at'], User_id = user_obj) # type: ignore
+                            deadline_at = validated_data['deadline_at'], User = user_obj) # type: ignore
             task_obj.save()
-            return "Tagless"
+        
         else:
-
             # user has entered a tag that is non-empty. so we check if we need to add the tag to the tag table or not.
-            if not tag_exists(validated_data['tag']): # type: ignore
-                tag_obj = Tag(tag = validated_data['tag']) # type: ignore
-                tag_obj.save()
-            else:
-                tag_obj = Tag.objects.get(tag = validated_data['tag']) # type: ignore
+            tag_obj = self.get_tag_or_create_if_not_exists(validated_data['tag']) # type: ignore
 
             task_obj = Task(task = validated_data['task'], is_complete = validated_data['is_complete'], # type: ignore
-                            deadline_at = validated_data['deadline_at'], User_id = user_obj, Tag_id = tag_obj) # type: ignore
+                            deadline_at = validated_data['deadline_at'], User = user_obj, Tag= tag_obj) # type: ignore
             task_obj.save()
             
-        return "Tagful"
+        return None
+    
+    
 
 
 class PUTTaskSerializer(serializers.ModelSerializer):
