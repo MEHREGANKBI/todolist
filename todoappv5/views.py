@@ -155,7 +155,7 @@ class TaskView(APIView):
 
 
 
-class CustomAuth(APIView):
+class SignupView(APIView):
 
 
     def signup(self, request):
