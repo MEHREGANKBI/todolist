@@ -37,14 +37,7 @@ def task_exists(task_id):
     else:
         return True
 
-def token_authenticate(request_headers):
-    jwt_token = request_headers.get('jwt-token', None)
-    try:   
-        verified_token = jwt.decode(jwt= jwt_token, key= jwt_secret, algorithms= ['HS256',])
-    except:
-        return False, None
-    else:
-        return True, verified_token['sub']
+
         
 
 def user_owns_task(user_obj, task_id):
