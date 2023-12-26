@@ -92,45 +92,28 @@ class TaskView(APIView):
         
 
         return JsonResponse(response_dict, safe= False, status= response_status)
-        
-
-
-    #     return JsonResponse(response_dict, safe= False, status = response_status)
-        
-
-    # def put(self, request):
-    #     response_status = None
-
-    #     token_is_valid, username = token_authenticate(request.headers)
-    #     if token_is_valid and user_exists(username):
-    #         deserialized_data = PUTTaskSerializer(data= request.data)
-    #         #this serializer will check if the task exists too so we don't have to check seperately.
-    #         if deserialized_data.is_valid() and user_owns_task(username, deserialized_data.validated_data['id']): # type: ignore
-    #             # At this point we know the user is legit and owns the task. the task exists too. so green light for edit.
-    #             save_status = deserialized_data.save()
-    #             response_status = status.HTTP_200_OK
-    #             response_dict['message'] = 'SUCCESS...'
-    #             response_dict['result'] = save_status  # type: ignore
-
-    #         elif deserialized_data.is_valid():
-    #             response_status = status.HTTP_403_FORBIDDEN
-    #             response_dict['message'] = 'ERROR...'
-    #             response_dict['result'] = 'You do not have the permission to complete this action.'
-
-    #         else:
-    #             response_status = status.HTTP_404_NOT_FOUND
-    #             response_dict['message'] = 'ERROR...'
-    #             response_dict['result'] = 'Task not found due to invalid data.' 
                 
 
+    def put(self, request):
+        response_status = None
+        user_obj = request.user
+        deserialized_data = PUTTaskSerializer(data= request.data)
 
-    #     else:
-    #         response_status = status.HTTP_401_UNAUTHORIZED
-    #         response_dict['message'] = 'ERROR...'
-    #         response_dict['result'] = 'You need to sign in.'
+        #this serializer will check if the task exists too so we don't have to check seperately.
+        if deserialized_data.is_valid() and user_owns_task(user_obj, deserialized_data.validated_data['id']): # type: ignore
+            deserialized_data.save()
+            response_status = status.HTTP_200_OK
+            response_dict['message'] = 'SUCCESS...'
+            response_dict['result'] = 'The status of the task was updated successfully.' 
 
+        else:
+            response_status = status.HTTP_404_NOT_FOUND
+            response_dict['message'] = 'ERROR...'
+            response_dict['result'] = 'Task not found.' 
+                
 
-    #     return JsonResponse(response_dict, safe= False, status= response_status)
+        return JsonResponse(response_dict, safe= False, status= response_status)
+
 
 
 

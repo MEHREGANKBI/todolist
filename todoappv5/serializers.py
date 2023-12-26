@@ -104,7 +104,7 @@ class PUTTaskSerializer(serializers.ModelSerializer):
         task_obj = Task.objects.get(id = validated_data['id']) # type: ignore
         task_obj.is_complete = validated_data['is_complete'] # type: ignore
         task_obj.save()
-        return 'The update process was completed successfully.'
+        return None
 
     class Meta:
         model = Task
