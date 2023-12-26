@@ -28,6 +28,8 @@ class UserCreationSerializer(serializers.ModelSerializer):
         return data
     
 
+
+
     def save(self):
         validated_data = self.validated_data
         user_obj = get_user_model()()
@@ -45,15 +47,8 @@ class UserCreationSerializer(serializers.ModelSerializer):
 
 
 
-
-class TagGETSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ['tag']
-
     
 class TaskGETSerializer(serializers.ModelSerializer):
-    #Tag = TagGETSerializer()
     Tag = serializers.ReadOnlyField(source = 'Tag.tag' ,allow_null = True)
     class Meta:
         model = Task
