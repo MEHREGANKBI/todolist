@@ -39,17 +39,12 @@ class UserCreationSerializer(serializers.ModelSerializer):
         user_obj.save()
 
 
-    
     class Meta:
         model = get_user_model()
         fields = [ 'username' , 'password', 'email' , 'first_name' , 'last_name' ]
 
 
 
-class UserGETSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = get_user_model()
-        fields = [ 'username' ]
 
 class TagGETSerializer(serializers.ModelSerializer):
     class Meta:
