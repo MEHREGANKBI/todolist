@@ -10,7 +10,7 @@ from .view_helpers import *
 
 
 class TaskView(APIView):
-    permission_classes = (IsAuthenticated)
+    permission_classes = [IsAuthenticated]
 
     def get_user_tasks(self,username, type_param):
         user_obj = get_user_model().objects.get(username = username)

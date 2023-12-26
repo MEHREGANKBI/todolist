@@ -44,7 +44,7 @@ class UserCreationSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = [ 'username' , 'password', 'email' , 'first_name' , 'last_name' ]
 
-        
+
 
 class UserGETSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,11 +58,11 @@ class TagGETSerializer(serializers.ModelSerializer):
 
     
 class TaskGETSerializer(serializers.ModelSerializer):
-    Tag = TagGETSerializer()
-    User = UserGETSerializer()
+    #Tag = TagGETSerializer()
+    Tag = serializers.ReadOnlyField(source = 'Tag.tag' ,allow_null = True)
     class Meta:
         model = Task
-        fields = ['id', 'task', 'is_complete', 'deadline_at', 'Tag', 'User']
+        fields = ['id', 'task', 'is_complete', 'deadline_at', 'Tag']
     
 
 class POSTSerializer(serializers.Serializer):
