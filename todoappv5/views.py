@@ -3,6 +3,8 @@ from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from django.http import Http404
+from redis import Redis
 
 from .serializers import *
 from .responses import response_dict
@@ -11,6 +13,17 @@ from .view_helpers import *
 
 class TaskView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def blocklist_check_decorator(func):
+        def blocklist_wrapper(self, request,*args, **kwargs):
+            redis_obj = Redis(host='localhost', port= 6379, decode_responses= True)
+            if redis_obj.exists(request.auth.__str__()):
+                raise Http404
+            else:
+                return func(self,request,*args,**kwargs)
+        
+        return blocklist_wrapper
+
 
     def get_user_tasks(self,username, type_param):
         user_obj = get_user_model().objects.get(username = username)
@@ -36,7 +49,7 @@ class TaskView(APIView):
 
         return response_message, response_result, response_status
 
-
+    @blocklist_check_decorator
     def get(self, request, type_param):
         type_param = type_param.strip().upper()
         valid_type_params = ['ALL', 'DONE', 'UNDONE']
@@ -54,7 +67,7 @@ class TaskView(APIView):
 
 
     
-
+    @blocklist_check_decorator
     def post(self, request):
         response_status = None
         user_obj = request.user
@@ -74,7 +87,7 @@ class TaskView(APIView):
 
         return JsonResponse(response_dict, safe= False, status =response_status)
     
-
+    @blocklist_check_decorator
     def delete(self, request, id_param):
         response_status = None
         user_obj = request.user
@@ -93,7 +106,7 @@ class TaskView(APIView):
 
         return JsonResponse(response_dict, safe= False, status= response_status)
                 
-
+    @blocklist_check_decorator
     def put(self, request):
         response_status = None
         user_obj = request.user
