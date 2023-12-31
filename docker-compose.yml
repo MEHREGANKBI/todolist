@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  todolist-django-sqlite:
+    image: "todolist:1.0"
+    ports:
+      - "8000:8000"
+    env_file:
+      - ".env"
+    volumes:
+      - "todolist_sqlite_volume:/home/todolist/persistence/"
+    
+  todolist-redis:
+    image: "redis:7.2.3-alpine3.19"
+    ports:
+      - "6379:6379"
+
+volumes:
+  todolist_sqlite_volume: 
