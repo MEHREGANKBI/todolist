@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
 from redis import Redis
+from os import getenv
 
 from .serializers import *
 from .responses import response_dict
@@ -16,7 +17,7 @@ class TaskView(APIView):
 
     def blocklist_check_decorator(func):
         def blocklist_wrapper(self, request,*args, **kwargs):
-            redis_obj = Redis(host='localhost', port= 6379, decode_responses= True)
+            redis_obj = Redis(host=getenv('DJANGO_REDIS_HOST'), port= 6379, decode_responses= True)
             if redis_obj.exists(request.auth.__str__()):
                 raise Http404
             else:
