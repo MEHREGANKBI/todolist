@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from hashlib import sha512
 import jwt
 from datetime import datetime
+from django.contrib.auth.base_user import AbstractBaseUser
 
 
 from .serializers import *
@@ -75,7 +76,19 @@ def task_exists(task_id : int) -> bool:
 
         
 
-def user_owns_task(user_obj, task_id):
+def user_owns_task(user_obj: type[AbstractBaseUser], task_id : int) -> bool:
+    '''
+    Parameters:
+        user_obj: An instance of the default user model representing a valid user that exists in the default user model.
+        task_id = A valid number i.e a non-negative integer.
+    
+    Returns:
+        Boolean: True/False
+
+    Description:
+        Given a user instance and a task id, check if the user owns the task and if so return True.
+        Otherwise, return False. Passing invalid users or numbers to this function may result in unexpected behavior.
+    '''
     task_obj = Task.objects.get(id = task_id)
     if user_obj == task_obj.User :
         return True
