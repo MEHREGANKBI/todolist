@@ -58,7 +58,7 @@ class TaskView(APIView):
         username = request.user.username
 
         if type_param in valid_type_params:
-            response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(username,type_param) # type: ignore
+            response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(username,type_param) 
         else:
             response_dict['message'] = 'ERROR...'
             response_dict['result'] = 'Invalid filter.'
@@ -83,7 +83,7 @@ class TaskView(APIView):
 
         else:
             response_dict['message'] = "ERROR!"
-            response_dict['result'] = deserialized_data.errors # type: ignore
+            response_dict['result'] = deserialized_data.errors 
             response_status = status.HTTP_400_BAD_REQUEST
 
         return JsonResponse(response_dict, safe= False, status =response_status)
@@ -157,6 +157,6 @@ class SignupView(APIView):
     def post(self,request):
         response_status = None
         
-        response_dict['message'], response_dict['result'], response_status = self.signup(request) # type: ignore 
+        response_dict['message'], response_dict['result'], response_status = self.signup(request)  
 
         return JsonResponse(response_dict, safe= False, status = response_status)
