@@ -23,7 +23,7 @@ class UserCreationSerializer(serializers.ModelSerializer):
         # the function below will automatically raise validationerror so no need to do it ourselves.
         pass_is_valid = validate_password(password= data['password'], user= data['username'], 
                                           password_validators= [UserAttributeSimilarityValidator(), MinimumLengthValidator(),
-                                                     CommonPasswordValidator(),NumericPasswordValidator()]) # type: ignore
+                                                     CommonPasswordValidator(),NumericPasswordValidator()]) 
 
         return data
     
@@ -33,11 +33,11 @@ class UserCreationSerializer(serializers.ModelSerializer):
     def save(self):
         validated_data = self.validated_data
         user_obj = get_user_model()()
-        user_obj.email = validated_data['email'] # type: ignore
-        user_obj.username = validated_data['username'] # type: ignore
-        user_obj.first_name = validated_data['first_name'] # type: ignore
-        user_obj.last_name = validated_data['last_name'] # type: ignore
-        user_obj.password = make_password(password= validated_data['password'], salt= salt) # type: ignore
+        user_obj.email = validated_data['email'] 
+        user_obj.username = validated_data['username'] 
+        user_obj.first_name = validated_data['first_name'] 
+        user_obj.last_name = validated_data['last_name'] 
+        user_obj.password = make_password(password= validated_data['password'], salt= salt) 
         user_obj.save()
 
 
@@ -74,20 +74,20 @@ class POSTSerializer(serializers.Serializer):
 
     def save(self, user_obj):
         validated_data = self.validated_data
-        user_tag = validated_data.get('tag', None) # type: ignore
-        validated_data['deadline_at'] = datetime.fromtimestamp(validated_data['deadline_at'], tz= timezone.utc) # type: ignore
+        user_tag = validated_data.get('tag', None) 
+        validated_data['deadline_at'] = datetime.fromtimestamp(validated_data['deadline_at'], tz= timezone.utc) 
 
         if user_tag == None or user_tag == '':
-            task_obj = Task(task = validated_data['task'], is_complete = validated_data['is_complete'], # type: ignore
-                            deadline_at = validated_data['deadline_at'], User = user_obj) # type: ignore
+            task_obj = Task(task = validated_data['task'], is_complete = validated_data['is_complete'], 
+                            deadline_at = validated_data['deadline_at'], User = user_obj) 
             task_obj.save()
         
         else:
             # user has entered a tag that is non-empty. so we check if we need to add the tag to the tag table or not.
-            tag_obj = self.get_tag_or_create_if_not_exists(validated_data['tag']) # type: ignore
+            tag_obj = self.get_tag_or_create_if_not_exists(validated_data['tag']) 
 
-            task_obj = Task(task = validated_data['task'], is_complete = validated_data['is_complete'], # type: ignore
-                            deadline_at = validated_data['deadline_at'], User = user_obj, Tag= tag_obj) # type: ignore
+            task_obj = Task(task = validated_data['task'], is_complete = validated_data['is_complete'], 
+                            deadline_at = validated_data['deadline_at'], User = user_obj, Tag= tag_obj) 
             task_obj.save()
             
         return None
@@ -101,8 +101,8 @@ class PUTTaskSerializer(serializers.ModelSerializer):
     
     def save(self):
         validated_data = self.validated_data
-        task_obj = Task.objects.get(id = validated_data['id']) # type: ignore
-        task_obj.is_complete = validated_data['is_complete'] # type: ignore
+        task_obj = Task.objects.get(id = validated_data['id']) 
+        task_obj.is_complete = validated_data['is_complete'] 
         task_obj.save()
         return None
 
