@@ -1,9 +1,4 @@
-from rest_framework import status
-from base64 import b64decode
 from django.shortcuts import get_object_or_404
-from hashlib import sha512
-import jwt
-from datetime import datetime
 from django.contrib.auth.base_user import AbstractBaseUser
 
 
