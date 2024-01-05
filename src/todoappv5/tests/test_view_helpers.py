@@ -38,7 +38,7 @@ class TestTagExists(TestCase):
 
     def test_non_existing_tags(self):
         tag1 = 'Cahrity'
-        tag2 = 'school' # This case is to ensure the case sensitvity of the function that is being tested.
+        tag2 = 'school' # This case is to ensure the case sensitivity of the function that is being tested.
         tag3 = 'Taxes'
 
         self.assertFalse(tag_exists(tag= tag1))
