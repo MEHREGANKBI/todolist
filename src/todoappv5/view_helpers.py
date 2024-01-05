@@ -53,7 +53,18 @@ def tag_exists(tag: str) -> bool:
         return True
     
 
-def task_exists(task_id):
+def task_exists(task_id : int) -> bool:
+    '''
+    Parameters:
+        task_id: a valid number i.e a non negative integer
+
+    Returns:
+        Boolean: True/False
+
+    Description:
+        Given an id, return True if an object exists with that very id, and return False otherwise. 
+        Passing invalid numbers to this function may result in unexpected behavior.
+    '''
     try:
         task_obj = get_object_or_404(Task, id = task_id)
     except:

@@ -1,4 +1,7 @@
 from django.test import TestCase
+from datetime import datetime, timezone
+
+
 from todoappv5.models import *
 
 
@@ -57,7 +60,7 @@ class TestUserExists(TestCase):
     For every type of test in this class, there will be a minimum of 3 test cases that'll be run to make sure
     the first or second one wasn't a fluke. 
 
-    The primary focus of this class is to ensure the username check works fine or not and as such, time consuming
+    The primary focus of this class is to ensure the username check works fine and as such, time consuming
     tasks like password digestion will be ignored if and/or when possible. The same goes for unrelated fields like email 
     uniqueness and so on.
     '''
@@ -97,3 +100,55 @@ class TestUserExists(TestCase):
         self.assertFalse(user_exists(username= user1))
         self.assertFalse(user_exists(username= user2))
         self.assertFalse(user_exists(username= user3))
+
+
+class TestTaskExists(TestCase):
+    '''
+    This class tests two major cases, a task that exsists and a task that doesn't. 
+    Invalid tasks will not be the subject of this test class since this function expects its sole parameter to be
+    sanitized. Tests regarding the invalid tasks are out of scope for this class and
+    are related to its own correspoding serializer.
+
+    For every type of test in this class, there will be a minimum of 3 test cases that'll be run to make sure
+    the first or second one wasn't a fluke. 
+
+    The primary focus of this class is to ensure the <id> check works fine and as such, other fields are simply filled
+    with valid items to satisfy the model's needs. Non-mandatory fields are ignored in this test.
+    '''
+
+    def setUp(self):
+        # All of the tasks will be made with the same user as the owner since the owner is not the topic of this test.
+        user_model = get_user_model()
+        user_model.objects.create(username='Jafarr', email='Jar@example.com', first_name='Jafar',
+                                   last_name='Jafari', password='12345678')
+        user_obj = user_model.objects.get(username= 'Jafarr')
+
+        dt_obj = datetime.fromtimestamp(1704492435, tz= timezone.utc)
+
+        # ids 1 to 5 should be created with the following commands.
+        Task.objects.create(task='Wash the dishes.', is_complete= True, User= user_obj, deadline_at= dt_obj)
+        Task.objects.create(task='Wash the clothes.', is_complete= False, User= user_obj, deadline_at= dt_obj)
+        Task.objects.create(task='Drink some water.', is_complete= False, User= user_obj, deadline_at= dt_obj)
+        Task.objects.create(task='Do homework.', is_complete= False, User= user_obj, deadline_at= dt_obj)
+        Task.objects.create(task='Walk the dogs.', is_complete= True, User= user_obj, deadline_at= dt_obj)
+
+
+    def tearDown(self):
+        Task.objects.all().delete()
+        get_user_model().objects.all().delete()
+
+
+    def test_existing_tasks(self):
+        id1, id2, id3 = 1, 2, 5
+
+        self.assertTrue(task_exists(task_id= id1))
+        self.assertTrue(task_exists(task_id= id2))
+        self.assertTrue(task_exists(task_id= id3))
+
+
+    def test_non_existing_tasks(self):
+        id1, id2, id3 = 69, 420, 6   # The id:6 shouldn't exist under normal circumstances.
+
+        self.assertFalse(task_exists(task_id= id1))
+        self.assertFalse(task_exists(task_id= id2))
+        self.assertFalse(task_exists(task_id= id3))
