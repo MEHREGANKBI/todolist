@@ -20,7 +20,18 @@ def user_exists(username):
         return True
     
 
-def tag_exists(tag):
+def tag_exists(tag: str) -> bool:
+    '''
+    Parameters: 
+        tag: A sanitized str conforming to the rules of the <tag> field of the Tag model.
+
+    Returns:
+        Boolean: True/False
+
+    Description:
+        Given a deserialized/sanitized tag, return True if the tag already exists in the Tag table (case-sensitive)
+        and return False otherwise. Feeding unsanitized strings or non-str tags may result in unexpected return values.
+    '''
     try:
         tag_obj = get_object_or_404(Tag, tag = tag)
     except:
