@@ -30,6 +30,18 @@ class TestTagExists(TestCase):
         tag1 = 'School'
         tag2 = 'Chores'
         tag3 = 'Work'
+        
         self.assertTrue(tag_exists(tag= tag1))
         self.assertTrue(tag_exists(tag= tag2))
         self.assertTrue(tag_exists(tag= tag3))
+
+
+    def test_non_existing_tags(self):
+        tag1 = 'Cahrity'
+        tag2 = 'school' # This case is to ensure the case sensitvity of the function that is being tested.
+        tag3 = 'Taxes'
+
+        self.assertFalse(tag_exists(tag= tag1))
+        self.assertFalse(tag_exists(tag= tag2))
+        self.assertFalse(tag_exists(tag= tag3))
+
