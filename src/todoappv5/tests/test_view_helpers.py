@@ -152,3 +152,75 @@ class TestTaskExists(TestCase):
         self.assertFalse(task_exists(task_id= id1))
         self.assertFalse(task_exists(task_id= id2))
         self.assertFalse(task_exists(task_id= id3))
+
+
+
+class TestUserOwnsTask(TestCase):
+    '''
+    This class tests two major cases, a user owning a task and a user not owning a task. 
+    Invalid tasks or users will not be the subject of this test class since this function expects its parameters to be
+    sanitized. Tests regarding the invalid tasks are out of scope for this class and
+    are related to its own correspoding serializer.
+
+    For every type of test in this class, there will be a minimum of 3 test cases that'll be run to make sure
+    the first or second one wasn't a fluke. 
+
+    The primary focus of this class is to ensure the ownership and as such, fields other than <User> are simply filled
+    with valid items to satisfy the model's needs. Non-mandatory fields are ignored altogether.
+    '''
+
+    def setUp(self):
+        # We'll need 6 users. 3 will own tasks and the other 3 won't. 
+        user_model = get_user_model()
+        user_list = []
+        user_list.append(user_model.objects.create(username='Jafarr', email='Jar@example.com', first_name='Jafar',
+                                   last_name='Jafari', password='12345678'))
+        
+        user_list.append(user_model.objects.create(username='Jafer', email='Jarf@example.com', first_name='Jaffar',
+                                   last_name='Jafari', password='123'))
+        
+        user_list.append(user_model.objects.create(username='Jafar', email='Jfaar@example.com', first_name='Jafar',
+                                   last_name='Jojari', password='678'))
+        
+        user_list.append(user_model.objects.create(username='samar', email='sam@example.com', first_name='summer',
+                                   last_name='samuel', password='12345678'))
+        
+        user_list.append(user_model.objects.create(username='Gab9819', email='Gabriella@example.com', first_name='Gaberiel',
+                                   last_name='lora', password='5678'))
+        
+        user_list.append(user_model.objects.create(username='Jayyson', email='Jasondunphy@example.com', first_name='Jamie',
+                                   last_name='Davidson', password='abcd'))
+        # the deadline field is not important in this test and thus will be the same for every task.
+        dt_obj = datetime.fromtimestamp(1704492435, tz= timezone.utc)
+
+        # ids 1 to 5 should be created with the following commands. some users may have more than one task. We'll avoid tags.
+        Task.objects.create(task='Wash the dishes.', is_complete= True, User= user_list[0], deadline_at= dt_obj)
+        Task.objects.create(task='Wash the clothes.', is_complete= False, User= user_list[5], deadline_at= dt_obj)
+        Task.objects.create(task='Drink some water.', is_complete= False, User= user_list[0], deadline_at= dt_obj)
+        Task.objects.create(task='Do homework.', is_complete= False, User= user_list[2], deadline_at= dt_obj)
+        Task.objects.create(task='Walk the dogs in the morning.', is_complete= False, User= user_list[2], deadline_at= dt_obj)
+        
+
+
+    def tearDown(self):
+        get_user_model().objects.all().delete()
+        Task.objects.all().delete()
+
+    def test_user_owning_task(self):
+        user1, task1 = get_user_model().objects.get(username= 'Jafarr'), 1
+        user2, task2 = get_user_model().objects.get(username= 'Jayyson'), 2
+        user3, task3 = get_user_model().objects.get(username= 'Jafar'), 4 
+
+        self.assertTrue(user_owns_task(user_obj= user1, task_id= task1))
+        self.assertTrue(user_owns_task(user_obj= user2, task_id= task2))
+        self.assertTrue(user_owns_task(user_obj= user3, task_id= task3))
+
+
+    def test_user_not_owning_task(self):
+        user1, task1 = get_user_model().objects.get(username= 'Jafarr'), 2  # This user owns a task, but it's not this task.
+        user2, task2 = get_user_model().objects.get(username= 'Gab9819'), 3 # Doesn't own any tasks.
+        user3, task3 = get_user_model().objects.get(username= 'samar'), 5 # Doesn't own any tasks.
+
+        self.assertFalse(user_owns_task(user_obj= user1, task_id= task1))
+        self.assertFalse(user_owns_task(user_obj= user2, task_id= task2))
+        self.assertFalse(user_owns_task(user_obj= user3, task_id= task3))
