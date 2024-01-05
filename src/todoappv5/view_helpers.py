@@ -11,7 +11,20 @@ from .models import *
 from .secrets import salt, jwt_secret
 
 
-def user_exists(username):
+def user_exists(username: str) -> bool:
+    '''
+    Parameters:
+        username: A sanitized/deserialized string representing the username field of the user model
+
+    Returns:
+        Boolean: True/False
+
+    Description:
+        Given a valid username string, check if it exists in the usermodel table, return True if it does, False otherwise.
+        This function is case-sensitive and is expected to be called with safe data.
+        Invalid values for the <username> argument will cause unexpected errors. 
+    '''
+
     try:
         user_obj = get_object_or_404(get_user_model(), username= username)
     except:
