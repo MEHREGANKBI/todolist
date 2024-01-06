@@ -26,8 +26,7 @@ class TaskView(APIView):
         return blocklist_wrapper
 
 
-    def get_user_tasks(self,username, type_param):
-        user_obj = get_user_model().objects.get(username = username)
+    def get_user_tasks(self,user_obj, type_param):
         user_queryset = Task.objects.filter(User = user_obj).select_related('Tag', 'User')
 
         if type_param == 'ALL':
@@ -55,10 +54,10 @@ class TaskView(APIView):
         type_param = type_param.strip().upper()
         valid_type_params = ['ALL', 'DONE', 'UNDONE']
         response_status = None
-        username = request.user.username
+        user_obj = request.user
 
         if type_param in valid_type_params:
-            response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(username,type_param) 
+            response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(user_obj,type_param) 
         else:
             response_dict['message'] = 'ERROR...'
             response_dict['result'] = 'Invalid filter.'
