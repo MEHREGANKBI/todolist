@@ -15,6 +15,7 @@ from .view_helpers import *
 class TaskView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @staticmethod
     def blocklist_check_decorator(func):
         def blocklist_wrapper(self, request,*args, **kwargs):
             redis_obj = Redis(host=getenv('DJANGO_REDIS_HOST'), port= 6379, decode_responses= True)
