@@ -6,6 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
 from redis import Redis
 from os import getenv
+from rest_framework.request import Request
+from django.contrib.auth.base_user import AbstractBaseUser
+
 
 from .serializers import *
 from .responses import response_dict
@@ -51,7 +54,20 @@ class TaskView(APIView):
         return response_message, response_result, response_status
 
     @blocklist_check_decorator
-    def get(self, request, type_param):
+    def get(self, request: type[Request], type_param: str) -> JsonResponse:
+        '''
+        Parameters:
+            self: unused.
+            request: A DRF request object. user and auth attributes are always used in this function.
+            type_param: A path argument of type str. Can be any value. Not every value will get a successful response.
+
+        Returns: 
+            JsonResponse: Contains the HTTP status of the request, and the response payload.
+
+        Description:
+            Given a valid user <Request.user> and type_param, return the tasks of that very user, filtered based on the
+            type_param constraints. Otherwise, return an error with its corresponding HTTP status.
+        '''
         type_param = type_param.strip().upper()
         valid_type_params = ['ALL', 'DONE', 'UNDONE']
         response_status = None
