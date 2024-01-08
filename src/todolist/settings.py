@@ -145,6 +145,7 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '10/min',
         'user': '30/min'
-    }
+    },
+    'EXCEPTION_HANDLER': 'todoappv5.exception_handlers.root_exception_handler',
 
 }
