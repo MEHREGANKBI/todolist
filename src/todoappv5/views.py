@@ -8,7 +8,7 @@ from redis import Redis
 from os import getenv
 from rest_framework.request import Request
 from django.contrib.auth.base_user import AbstractBaseUser
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ParseError
 
 
 from .serializers import *
@@ -48,9 +48,7 @@ class TaskView(APIView):
             response_status = status.HTTP_200_OK
             response_message = 'SUCCESS...'
         else:
-            response_status = status.HTTP_404_NOT_FOUND
-            response_message = 'ERROR...'
-            response_result = 'You currently don\'t have any tasks.'
+            raise Http404('You currently do not have any tasks.')
 
         return response_message, response_result, response_status
 
@@ -77,9 +75,7 @@ class TaskView(APIView):
         if type_param in valid_type_params:
             response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(user_obj,type_param) 
         else:
-            response_dict['message'] = 'ERROR...'
-            response_dict['result'] = 'Invalid filter.'
-            response_status = status.HTTP_400_BAD_REQUEST
+            raise ParseError('Invalid filter.')
 
         return JsonResponse(response_dict, safe= False, status= response_status)
 

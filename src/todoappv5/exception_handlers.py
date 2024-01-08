@@ -35,7 +35,7 @@ def root_exception_handler(exc, context):
 
 def custom_404_handler(exc):
     response_status = HTTP_404_NOT_FOUND
-    response_message = 'ERROR 404'
+    response_dict['message'] = 'ERROR 404'
 
     if exc.__str__() not in [None, '']:
         response_dict['result'] = exc.__str__()
@@ -59,7 +59,7 @@ def custom_auth_fail_handler(exc):
 
 def custom_parse_error_handler(exc):
     response_status = HTTP_400_BAD_REQUEST
-    response_message = 'ERROR 400'
+    response_dict['message'] = 'ERROR 400'
 
     if exc.__str__() not in [None, '']:
         response_dict['result'] = exc.__str__()
@@ -71,7 +71,7 @@ def custom_parse_error_handler(exc):
 
 def custom_permission_denied_handler(exc):
     response_status = HTTP_403_FORBIDDEN
-    response_message = 'ERROR 403'
+    response_dict['message'] = 'ERROR 403'
 
     if exc.__str__() not in [None, '']:
         response_dict['result'] = exc.__str__()
@@ -83,7 +83,7 @@ def custom_permission_denied_handler(exc):
 
 def custom_method_error_handler(exc):
     response_status = HTTP_405_METHOD_NOT_ALLOWED
-    response_message = 'ERROR 405'
+    response_dict['message'] = 'ERROR 405'
 
     if exc.__str__() not in [None, '']:
         response_dict['result'] = exc.__str__()
@@ -95,7 +95,7 @@ def custom_method_error_handler(exc):
 
 def custom_media_error_handler(exc):
     response_status = HTTP_415_UNSUPPORTED_MEDIA_TYPE
-    response_message = 'ERROR 415'
+    response_dict['message'] = 'ERROR 415'
 
     if exc.__str__() not in [None, '']:
         response_dict['result'] = exc.__str__()
@@ -107,7 +107,7 @@ def custom_media_error_handler(exc):
 
 def custom_throttle_error_handler(exc):
     response_status = HTTP_429_TOO_MANY_REQUESTS
-    response_message = 'ERROR 429'
+    response_dict['message'] = 'ERROR 429'
 
     if exc.__str__() not in [None, '']:
         response_dict['result'] = exc.__str__()
@@ -119,7 +119,7 @@ def custom_throttle_error_handler(exc):
 
 def custom_validation_error_handler(exc):
     response_status = HTTP_400_BAD_REQUEST
-    response_message = 'ERROR 400'
+    response_dict['message'] = 'ERROR 400'
 
     if exc.__str__() not in [None, '']:
         response_dict['result'] = exc.__str__()
@@ -131,7 +131,7 @@ def custom_validation_error_handler(exc):
 
 def cutsom_not_accetable_handler(exc):
     response_status = HTTP_406_NOT_ACCEPTABLE
-    response_message = 'ERROR 406'
+    response_dict['message'] = 'ERROR 406'
 
     if exc.__str__() not in [None, '']:
         response_dict['result'] = exc.__str__()
