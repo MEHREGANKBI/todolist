@@ -8,6 +8,7 @@ from redis import Redis
 from os import getenv
 from rest_framework.request import Request
 from django.contrib.auth.base_user import AbstractBaseUser
+from rest_framework.exceptions import PermissionDenied
 
 
 from .serializers import *
@@ -23,7 +24,7 @@ class TaskView(APIView):
         def blocklist_wrapper(self, request,*args, **kwargs):
             redis_obj = Redis(host=getenv('DJANGO_REDIS_HOST'), port= 6379, decode_responses= True)
             if redis_obj.exists(request.auth.__str__()):
-                raise Http404
+                raise PermissionDenied('Your client is not allowed to access this service.')
             else:
                 return func(self,request,*args,**kwargs)
         
