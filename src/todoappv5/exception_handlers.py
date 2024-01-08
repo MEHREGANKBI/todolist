@@ -27,7 +27,7 @@ def root_exception_handler(exc, context):
     
     else:
         response_dict['message'] = 'ERROR...'
-        response_dict['result'] = 'Unknown Error Occured!!!'
+        response_dict['result'] = exc.__class__.__name__
         response_status = HTTP_500_INTERNAL_SERVER_ERROR
         return JsonResponse(response_dict, safe= False, status = response_status)
     

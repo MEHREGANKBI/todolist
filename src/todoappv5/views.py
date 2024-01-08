@@ -95,9 +95,7 @@ class TaskView(APIView):
             response_status = status.HTTP_200_OK
 
         else:
-            response_dict['message'] = "ERROR!"
-            response_dict['result'] = deserialized_data.errors 
-            response_status = status.HTTP_400_BAD_REQUEST
+            raise ParseError(deserialized_data.errors.__str__())
 
         return JsonResponse(response_dict, safe= False, status =response_status)
     
@@ -113,9 +111,7 @@ class TaskView(APIView):
                 response_dict['message'] = 'SUCCESS...'
                 response_dict['result'] = 'The task was successfully removed.'
         else:
-                response_status = status.HTTP_404_NOT_FOUND
-                response_dict['message'] = 'ERROR...'
-                response_dict['result'] = 'Task not found.'
+                raise Http404('Task not found.')
         
 
         return JsonResponse(response_dict, safe= False, status= response_status)
@@ -134,9 +130,7 @@ class TaskView(APIView):
             response_dict['result'] = 'The status of the task was updated successfully.' 
 
         else:
-            response_status = status.HTTP_404_NOT_FOUND
-            response_dict['message'] = 'ERROR...'
-            response_dict['result'] = 'Task not found.' 
+            raise Http404('Task not found.')
                 
 
         return JsonResponse(response_dict, safe= False, status= response_status)
