@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [ host.strip() for host in getenv('DJANGO_ALLOWED_HOSTS').split(
 # Application definition
 
 INSTALLED_APPS = [
+    "accounts.apps.AccountsConfig",
     "rest_framework_simplejwt",
     "todoappv5.apps.Todoappv5Config",
     "todoappv4.apps.Todoappv4Config",
