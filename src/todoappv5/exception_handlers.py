@@ -26,8 +26,8 @@ def root_exception_handler(exc, context):
         return exception_dict[exc_name](exc= exc)
     
     else:
-        response_dict['message'] = 'ERROR...'
-        response_dict['result'] = exc.__class__.__name__
+        response_dict['message'] = exc.__class__.__name__
+        response_dict['result'] = exc.__str__()
         response_status = HTTP_500_INTERNAL_SERVER_ERROR
         return JsonResponse(response_dict, safe= False, status = response_status)
     
