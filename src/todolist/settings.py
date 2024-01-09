@@ -147,6 +147,6 @@ REST_FRAMEWORK = {
         'anon': '10/min',
         'user': '30/min'
     },
-    'EXCEPTION_HANDLER': 'todoappv5.exception_handlers.root_exception_handler',
+    'EXCEPTION_HANDLER': 'exception_handler.custom_exception_handlers.root_exception_handler',
 
 }
