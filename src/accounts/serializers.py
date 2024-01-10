@@ -43,7 +43,7 @@ class UserCreationSerializer(serializers.ModelSerializer):
 
 
 class TokenBlockListSerializer(serializers.ModelSerializer):
-    access_token = serializers.CharField(write_only = True, required = True)
+    access_token = serializers.CharField(write_only = True, required = True, max_length = 8192, min_length = 64)
 
     class Meta:
         model = TokenBlockList
