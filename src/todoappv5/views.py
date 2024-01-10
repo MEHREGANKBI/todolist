@@ -12,7 +12,6 @@ from rest_framework.exceptions import PermissionDenied, ParseError
 
 
 from .serializers import *
-from .responses import response_dict
 from .view_helpers import *
 
 
@@ -67,6 +66,7 @@ class TaskView(APIView):
             Given a valid user <Request.user> and type_param, return the tasks of that very user, filtered based on the
             type_param constraints. Otherwise, return an error with its corresponding HTTP status.
         '''
+        response_dict = {}
         type_param = type_param.strip().upper()
         valid_type_params = ['ALL', 'DONE', 'UNDONE']
         response_status = None
@@ -83,6 +83,7 @@ class TaskView(APIView):
     
     @blocklist_check_decorator
     def post(self, request):
+        response_dict = {}
         response_status = None
         user_obj = request.user
         # If the json is not valid, it'll send an automatic response, the pattern of which is not the same as my responses. 
@@ -101,6 +102,7 @@ class TaskView(APIView):
     
     @blocklist_check_decorator
     def delete(self, request, id_param):
+        response_dict = {}
         response_status = None
         user_obj = request.user
         # now we check if the task with the given id is owned by the user whose username is in the token.
@@ -118,6 +120,7 @@ class TaskView(APIView):
                 
     @blocklist_check_decorator
     def put(self, request):
+        response_dict = {}
         response_status = None
         user_obj = request.user
         deserialized_data = PUTTaskSerializer(data= request.data)
