@@ -35,3 +35,11 @@ class SignupView(APIView):
         response_dict['message'], response_dict['result'], response_status = self.signup(request)  
 
         return JsonResponse(response_dict, safe= False, status = response_status)
+    
+
+
+
+class LogOutView(APIView):
+
+    def post(self,request):
+        pass
