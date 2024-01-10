@@ -9,6 +9,7 @@ from django.contrib.auth.password_validation import (UserAttributeSimilarityVali
 
 
 from .secrets import salt
+from .models import *
 
 class UserCreationSerializer(serializers.ModelSerializer):
 
@@ -37,3 +38,12 @@ class UserCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = [ 'username' , 'password', 'email' , 'first_name' , 'last_name' ]
+
+
+
+
+class TokenBlockListSerializer(serializers.ModelSerializer):
+    access_token = serializers.CharField(write_only = True, required = True)
+
+    class Meta:
+        model = TokenBlockList
