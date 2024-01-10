@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status 
 from django.http import JsonResponse
+from rest_framework.exceptions import ParseError
 
 from .serializers import UserCreationSerializer
 
@@ -20,9 +21,7 @@ class SignupView(APIView):
             response_result = 'Your account was created. You can sign in now.'
 
         else:
-            response_status = status.HTTP_400_BAD_REQUEST
-            response_message = 'ERROR...'
-            response_result = deserialized_data.errors
+            raise ParseError(deserialized_data.errors.__str__())
 
         return response_message, response_result, response_status
 
