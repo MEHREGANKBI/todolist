@@ -148,3 +148,30 @@ def cutsom_not_accetable_handler(exc):
         response_dict['result'] = 'Not Acceptable.'
 
     return JsonResponse(response_dict, safe= False, status = response_status)
+
+
+
+def django_custom_handler_400(*args, **kwargs):
+    response_dict = {}
+    response_dict['message'] = 'ERROR 400'
+    response_dict['result'] = 'Invalid request!'
+
+    return JsonResponse(response_dict, safe=False, status= HTTP_400_BAD_REQUEST)
+
+
+def django_custom_handler_404(*args, **kwargs):
+    response_dict = {}
+    response_dict['message'] = 'ERROR 404'
+    response_dict['result'] = 'Not Found!'
+
+    return JsonResponse(response_dict, safe=False, status= HTTP_404_NOT_FOUND)
+
+
+
+def django_custom_handler_403(*args, **kwargs):
+    response_dict = {}
+    response_dict['message'] = 'ERROR 403'
+    response_dict['result'] = 'Permission Denied!'
+
+    return JsonResponse(response_dict, safe=False, status= HTTP_403_FORBIDDEN)
+
