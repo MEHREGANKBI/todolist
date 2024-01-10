@@ -154,5 +154,6 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "SIGNING_KEY": getenv('DJANGO_SECRETS_JWT'),
 
 }
