@@ -4,7 +4,6 @@ from rest_framework.exceptions import *
 from rest_framework.status import *
 
 
-from todoappv5.responses import response_dict
 
 def root_exception_handler(exc, context):
     exception_dict = {
@@ -26,6 +25,7 @@ def root_exception_handler(exc, context):
         return exception_dict[exc_name](exc= exc)
     
     else:
+        response_dict = {}
         response_dict['message'] = exc.__class__.__name__
         response_dict['result'] = exc.__str__()
         response_status = HTTP_500_INTERNAL_SERVER_ERROR
@@ -34,6 +34,7 @@ def root_exception_handler(exc, context):
 
 
 def custom_404_handler(exc):
+    response_dict = {}
     response_status = HTTP_404_NOT_FOUND
     response_dict['message'] = 'ERROR 404'
 
@@ -46,6 +47,7 @@ def custom_404_handler(exc):
         
 
 def custom_auth_fail_handler(exc):
+    response_dict = {}
     response_status = HTTP_401_UNAUTHORIZED
     response_dict['message'] = 'ERROR 401'
 
@@ -58,6 +60,7 @@ def custom_auth_fail_handler(exc):
 
 
 def custom_parse_error_handler(exc):
+    response_dict = {}
     response_status = HTTP_400_BAD_REQUEST
     response_dict['message'] = 'ERROR 400'
 
@@ -70,6 +73,7 @@ def custom_parse_error_handler(exc):
 
 
 def custom_permission_denied_handler(exc):
+    response_dict = {}
     response_status = HTTP_403_FORBIDDEN
     response_dict['message'] = 'ERROR 403'
 
@@ -82,6 +86,7 @@ def custom_permission_denied_handler(exc):
 
 
 def custom_method_error_handler(exc):
+    response_dict = {}
     response_status = HTTP_405_METHOD_NOT_ALLOWED
     response_dict['message'] = 'ERROR 405'
 
@@ -94,6 +99,7 @@ def custom_method_error_handler(exc):
 
 
 def custom_media_error_handler(exc):
+    response_dict = {}
     response_status = HTTP_415_UNSUPPORTED_MEDIA_TYPE
     response_dict['message'] = 'ERROR 415'
 
@@ -106,6 +112,7 @@ def custom_media_error_handler(exc):
 
 
 def custom_throttle_error_handler(exc):
+    response_dict = {}
     response_status = HTTP_429_TOO_MANY_REQUESTS
     response_dict['message'] = 'ERROR 429'
 
@@ -118,6 +125,7 @@ def custom_throttle_error_handler(exc):
 
 
 def custom_validation_error_handler(exc):
+    response_dict = {}
     response_status = HTTP_400_BAD_REQUEST
     response_dict['message'] = 'ERROR 400'
 
@@ -130,6 +138,7 @@ def custom_validation_error_handler(exc):
 
 
 def cutsom_not_accetable_handler(exc):
+    response_dict = {}
     response_status = HTTP_406_NOT_ACCEPTABLE
     response_dict['message'] = 'ERROR 406'
 
