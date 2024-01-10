@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from os import getenv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -148,5 +149,10 @@ REST_FRAMEWORK = {
         'user': '30/min'
     },
     'EXCEPTION_HANDLER': 'exception_handler.custom_exception_handlers.root_exception_handler',
+
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
 
 }
