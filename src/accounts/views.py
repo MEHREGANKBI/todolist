@@ -3,7 +3,7 @@ from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.exceptions import ParseError
 
-from .serializers import UserCreationSerializer
+from .serializers import UserCreationSerializer, TokenBlockListSerializer
 
 
 
@@ -42,4 +42,17 @@ class SignupView(APIView):
 class LogOutView(APIView):
 
     def post(self,request):
-        pass
+        response_dict = {}
+        response_status = None
+        deserialized_data = TokenBlockListSerializer(data= request.data)
+
+        if deserialized_data.is_valid():
+            response_dict['message'] = 'SUCCESS...'
+            response_dict['result'] = deserialized_data.validated_data
+            response_status = status.HTTP_200_OK
+        
+        else:
+            raise ParseError(deserialized_data.errors.__str__())
+        
+        
+        return JsonResponse(response_dict, safe= False, status= response_status)

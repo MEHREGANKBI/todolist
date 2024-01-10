@@ -47,3 +47,4 @@ class TokenBlockListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TokenBlockList
+        fields = ['refresh_token', 'access_token']
