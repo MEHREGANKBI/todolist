@@ -1,5 +1,5 @@
 from rest_framework.views import exception_handler
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from rest_framework.exceptions import *
 from rest_framework.status import *
 
