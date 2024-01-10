@@ -175,3 +175,11 @@ def django_custom_handler_403(*args, **kwargs):
 
     return JsonResponse(response_dict, safe=False, status= HTTP_403_FORBIDDEN)
 
+
+
+def django_custom_handler_500(*args, **kwargs):
+    response_dict = {}
+    response_dict['message'] = 'ERROR 500'
+    response_dict['result'] = 'Internal Error!'
+
+    return JsonResponse(response_dict, safe=False, status= HTTP_500_INTERNAL_SERVER_ERROR)

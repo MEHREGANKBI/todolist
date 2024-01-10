@@ -27,3 +27,12 @@ urlpatterns = [
     path("todoappv1/", include("todoappv1.urls"), name = "todoappv1urls"),
     path("admin/", admin.site.urls),
 ]
+
+
+handler500 = "exception_handler.custom_exception_handlers.django_custom_handler_500"
+
+handler400 = "exception_handler.custom_exception_handlers.django_custom_handler_400"
+
+handler404 = "exception_handler.custom_exception_handlers.django_custom_handler_404"
+
+handler403 = "exception_handler.custom_exception_handlers.django_custom_handler_403"
