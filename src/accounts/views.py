@@ -62,13 +62,13 @@ class LogOutView(APIView):
 
 
 
-class RefreshTokenWrapper(APIView):
+class RefreshTokenWrapper(TokenRefreshView):
     def post(self, request):
         deserialized_refresh_token = RefreshTokenSerializer(data= request.data)
 
         # This serializer validates both the parsing errors and blocklisting errors.
         if deserialized_refresh_token.is_valid():
-            refresh_view_return =  TokenRefreshView.as_view()(request)
+            refresh_view_return =  super().post(request=request)
         else:
             raise PermissionDenied(deserialized_refresh_token.errors.__str__())
         
