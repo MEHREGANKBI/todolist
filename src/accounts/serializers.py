@@ -87,18 +87,15 @@ class TokenBlockListSerializer(serializers.ModelSerializer):
 
 
 
-class RefreshTokenSerializer(serializers.ModelSerializer):
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh = serializers.CharField(max_length = 8192, min_length = 64, required = True)
 
     def validate(self, data):
         # Here. we'll check if the refresh token that we received exists in the blocklist table.
-        token_exists_in_blocklist = TokenBlockList.objects.filter(refresh_token= data['refresh_token']).exists()
+        token_exists_in_blocklist = TokenBlockList.objects.filter(refresh_token= data['refresh']).exists()
 
         if token_exists_in_blocklist:
             raise serializers.ValidationError('Your refresh token is not allowed to make access tokens.')
         else:
             return data
         
-
-    class Meta:
-        model = TokenBlockList
-        fields = ['refresh_token']

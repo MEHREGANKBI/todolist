@@ -5,7 +5,6 @@ from rest_framework.exceptions import ParseError, PermissionDenied
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .serializers import UserCreationSerializer, TokenBlockListSerializer, RefreshTokenSerializer
-from .models import TokenBlockList
 
 
 
