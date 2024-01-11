@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework import status 
 from django.http import JsonResponse
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, PermissionDenied
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from .serializers import UserCreationSerializer, TokenBlockListSerializer, RefreshTokenSerializer
 from .models import TokenBlockList
@@ -66,8 +67,8 @@ class LogOutView(APIView):
 
             # This serializer validates both the parsing errors and blocklisting errors.
             if deserialized_refresh_token.is_valid():
-                pass
+                TokenRefreshView.as_view()(request)
             else:
-                raise PermissionError(deserialized_refresh_token.errors.__str__())
+                raise PermissionDenied(deserialized_refresh_token.errors.__str__())
                 
             
