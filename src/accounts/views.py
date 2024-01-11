@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from rest_framework.exceptions import ParseError
 
 from .serializers import UserCreationSerializer, TokenBlockListSerializer
+from .models import TokenBlockList
 
 
 
@@ -57,3 +58,10 @@ class LogOutView(APIView):
         
         
         return JsonResponse(response_dict, safe= False, status= response_status)
+    
+
+    class RefreshTokenWrapper(APIView):
+        def post(self, request):
+            pass
+            # If it exists, it means that the token is blocked.
+            # refrsesh_token_exists = TokenBlockList.objects.filter(refresh_token = )
