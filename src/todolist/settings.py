@@ -157,3 +157,5 @@ SIMPLE_JWT = {
     "SIGNING_KEY": getenv('DJANGO_SECRETS_JWT'),
 
 }
+
+CONN_MAX_AGE= int(getenv('DJANGO_DB_CONN_MAX_AGE'))
