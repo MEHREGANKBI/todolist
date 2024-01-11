@@ -47,6 +47,7 @@ class LogOutView(APIView):
         deserialized_data = TokenBlockListSerializer(data= request.data)
 
         if deserialized_data.is_valid():
+            deserialized_data.save()
             response_dict['message'] = 'SUCCESS...'
             response_dict['result'] = deserialized_data.validated_data
             response_status = status.HTTP_200_OK
