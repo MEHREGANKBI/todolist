@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+import jwt
 from django.contrib.auth.password_validation import (UserAttributeSimilarityValidator,
                                                      MinimumLengthValidator,
                                                      CommonPasswordValidator,
@@ -10,6 +11,7 @@ from django.contrib.auth.password_validation import (UserAttributeSimilarityVali
 
 from .secrets import salt
 from .models import *
+from todolist.settings import SIMPLE_JWT
 
 class UserCreationSerializer(serializers.ModelSerializer):
 
@@ -44,6 +46,26 @@ class UserCreationSerializer(serializers.ModelSerializer):
 
 class TokenBlockListSerializer(serializers.ModelSerializer):
     access_token = serializers.CharField(write_only = True, required = True, max_length = 8192, min_length = 64)
+
+    # Maybe it's ok if not both of the tokens are valid. for example, a valid refresh and invalid access token.
+    def validate(self,data):
+        access_is_valid = self.token_is_valid(jwt_token= data['access_token'])
+        refresh_is_valid = self.token_is_valid(jwt_token= data['refresh_token'])
+
+        if (not refresh_is_valid) or (not access_is_valid):
+            raise serializers.ValidationError('Invalid tokens received.') 
+        else:
+            return data
+
+
+    def token_is_valid(self,jwt_token):
+        try:
+            jwt.decode(jwt= jwt_token, key= SIMPLE_JWT['SIGNING_KEY'], algorithms= ['HS256',])
+        except:
+            return False
+        else:
+            return True
+
 
     class Meta:
         model = TokenBlockList
