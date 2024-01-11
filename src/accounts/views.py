@@ -3,7 +3,7 @@ from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.exceptions import ParseError
 
-from .serializers import UserCreationSerializer, TokenBlockListSerializer
+from .serializers import UserCreationSerializer, TokenBlockListSerializer, RefreshTokenSerializer
 from .models import TokenBlockList
 
 
@@ -62,6 +62,12 @@ class LogOutView(APIView):
 
     class RefreshTokenWrapper(APIView):
         def post(self, request):
-            pass
-            # If it exists, it means that the token is blocked.
-            # refrsesh_token_exists = TokenBlockList.objects.filter(refresh_token = )
+            deserialized_refresh_token = RefreshTokenSerializer(data= request.data)
+
+            # This serializer validates both the parsing errors and blocklisting errors.
+            if deserialized_refresh_token.is_valid():
+                pass
+            else:
+                raise PermissionError(deserialized_refresh_token.errors.__str__())
+                
+            
