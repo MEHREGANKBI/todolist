@@ -84,3 +84,11 @@ class TokenBlockListSerializer(serializers.ModelSerializer):
     class Meta:
         model = TokenBlockList
         fields = ['refresh_token', 'access_token']
+
+
+
+class RefreshTokenSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TokenBlockList
+        fields = ['refresh_token']
