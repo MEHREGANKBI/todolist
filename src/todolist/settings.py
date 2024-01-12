@@ -158,4 +158,4 @@ SIMPLE_JWT = {
 
 }
 
-CONN_MAX_AGE= int(getenv('DJANGO_DB_CONN_MAX_AGE'))
+CONN_MAX_AGE= eval(getenv('DJANGO_DB_CONN_MAX_AGE'))
