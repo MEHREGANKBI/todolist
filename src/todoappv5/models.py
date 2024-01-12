@@ -1,6 +1,7 @@
 from django.db import models
 from django.core import validators
 from django.contrib.auth import get_user_model
+from django.db.models.query import QuerySet
 
 
 class Tag(models.Model):
@@ -31,3 +32,10 @@ class Task(models.Model):
 
     def __str__(self):
         return f'task={self.task}, is_complete={self.is_complete},\ndeadline_at={self.deadline_at}, User={self.User}, Tag={self.Tag}' # type: ignore
+    
+
+
+
+class CustomModelManager(models.Manager):
+    def get_queryset(self, is_complete, tag, user) -> QuerySet:
+        query_set = super().get_queryset()
