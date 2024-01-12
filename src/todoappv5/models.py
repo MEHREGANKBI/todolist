@@ -39,3 +39,13 @@ class Task(models.Model):
 class CustomModelManager(models.Manager):
     def get_queryset(self, is_complete, tag, user) -> QuerySet:
         query_set = super().get_queryset()
+
+    
+    def __filter_by_tag(self, tag):
+        pass
+
+    def __filter_by_user(self,user):
+        pass
+
+    def __filter_by_completeness(self,is_complete):
+        pass
