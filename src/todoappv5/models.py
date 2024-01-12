@@ -14,6 +14,22 @@ class Tag(models.Model):
         return f'tag={self.tag},id={self.id}' # type: ignore
     
 
+
+class CustomTaskModelManager(models.Manager):
+    def get_queryset(self, is_complete, tag, user) -> QuerySet:
+        query_set = super().get_queryset()
+
+    
+    def __filter_by_tag(self, tag):
+        pass
+
+    def __filter_by_user(self,user):
+        pass
+
+    def __filter_by_completeness(self,is_complete):
+        pass
+    
+
 class Task(models.Model):
     task = models.CharField(null = False, blank = False, max_length = 128, validators= [
         validators.MinLengthValidator(4, message= 'task description must be at least 4 characters.'),
@@ -30,22 +46,12 @@ class Task(models.Model):
     User = models.ForeignKey(get_user_model(), models.CASCADE, null = False, blank = False)
 
 
+    objects = CustomTaskModelManager()
+
+
     def __str__(self):
         return f'task={self.task}, is_complete={self.is_complete},\ndeadline_at={self.deadline_at}, User={self.User}, Tag={self.Tag}' # type: ignore
     
 
 
 
-class CustomModelManager(models.Manager):
-    def get_queryset(self, is_complete, tag, user) -> QuerySet:
-        query_set = super().get_queryset()
-
-    
-    def __filter_by_tag(self, tag):
-        pass
-
-    def __filter_by_user(self,user):
-        pass
-
-    def __filter_by_completeness(self,is_complete):
-        pass
