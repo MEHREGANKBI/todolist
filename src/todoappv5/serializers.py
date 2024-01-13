@@ -72,3 +72,8 @@ class PUTTaskSerializer(serializers.ModelSerializer):
     
 
 
+class TaskQueryParamsSerializer(serializers.Serializer):
+    # Even though this serializer won't read from or write to the Tag model, the tag field must meet the constraints
+    # of this field. so instead of defining a new charfield, we refer to the model field for validation.
+    tag = serializers.ListField(child= serializers.ModelField(model_field= Tag().__meta.get_field('tag')), required= False)
+    complete = serializers.BooleanField(required= False)
