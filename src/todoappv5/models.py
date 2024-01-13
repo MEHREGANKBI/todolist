@@ -17,8 +17,18 @@ class Tag(models.Model):
 
 class CustomTaskModelManager(models.Manager):
     def get_queryset(self, is_complete, tag, user) -> QuerySet:
+
         query_set = super().get_queryset()
 
+        query_set = self.__filter_by_tag(tag= tag)
+
+        query_set = self.__filter_by_user(user= user)
+
+        query_set = self.__filter_by_completeness(is_complete= is_complete)
+
+        return query_set
+
+    
     
     def __filter_by_tag(self, tag):
         pass
