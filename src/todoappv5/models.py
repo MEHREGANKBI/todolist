@@ -2,6 +2,7 @@ from django.db import models
 from django.core import validators
 from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
+from rest_framework.exceptions import NotFound
 
 
 class Tag(models.Model):
@@ -26,6 +27,9 @@ class CustomTaskModelManager(models.Manager):
         query_set = self.__filter_by_user(user= user, query_set = query_set)
 
         query_set = self.__filter_by_completeness(is_complete= is_complete, query_set = query_set)
+
+        if not query_set.exists():
+            raise NotFound('No task matched the filter(s).')
 
         return query_set
 
