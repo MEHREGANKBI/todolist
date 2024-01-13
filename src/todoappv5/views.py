@@ -57,7 +57,6 @@ class TaskView(APIView):
         Parameters:
             self: unused.
             request: A DRF request object. user and auth attributes are always used in this function.
-            type_param: A path argument of type str. Can be any value. Not every value will get a successful response.
 
         Returns: 
             JsonResponse: Contains the HTTP status of the request, and the response payload.
@@ -67,13 +66,13 @@ class TaskView(APIView):
             type_param constraints. Otherwise, return an error with its corresponding HTTP status.
         '''
         response_dict = {}
-        type_param = type_param.strip().upper()
-        valid_type_params = ['ALL', 'DONE', 'UNDONE']
         response_status = None
-        user_obj = request.user
 
-        if type_param in valid_type_params:
-            response_dict['message'], response_dict['result'], response_status = self.get_user_tasks(user_obj,type_param) 
+        deserialized_query_params = TaskQueryParamsSerializer(data= request.query_params)
+        if deserialized_query_params.is_valid():
+            pass
+        
+         
         else:
             raise ParseError('Invalid filter.')
 
