@@ -70,11 +70,17 @@ class TaskView(APIView):
 
         deserialized_query_params = TaskQueryParamsSerializer(data= request.query_params)
         if deserialized_query_params.is_valid():
-            pass
-        
+            validated_data = deserialized_query_params.validated_data
+            filtered_queryset = Task.objects.get_queryset(is_complete= validated_data.get('is_complete', None),
+                                                          tag= validated_data.get('tag', None), user= request.user)
+            # With the queryset fully filtered to the client's liking, we can now serialize it.
+            serialized_queryset = TaskGETSerializer(filtered_queryset, many= True)
+            response_dict['result'] = serialized_queryset.data
+            response_dict['message'] = 'SUCCESS...'
+            response_status = status.HTTP_200_OK
          
         else:
-            raise ParseError('Invalid filter.')
+            raise ParseError(deserialized_query_params.errors.__str__())
 
         return JsonResponse(response_dict, safe= False, status= response_status)
 
