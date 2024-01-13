@@ -30,26 +30,6 @@ class TaskView(APIView):
         return blocklist_wrapper
 
 
-    def get_user_tasks(self,user_obj, type_param):
-        user_queryset = Task.objects.filter(User = user_obj).select_related('Tag', 'User')
-
-        if type_param == 'ALL':
-            pass
-        elif type_param == 'DONE':
-            user_queryset = user_queryset.filter(is_complete = True)
-        elif type_param == 'UNDONE':
-            user_queryset = user_queryset.filter(is_complete = False)
-
-        # now we will check whether or not after the filtering process, we have any data left to send to the client. 
-        if user_queryset.exists():
-            serilized_user_data = TaskGETSerializer(user_queryset, many = True)
-            response_result = serilized_user_data.data
-            response_status = status.HTTP_200_OK
-            response_message = 'SUCCESS...'
-        else:
-            raise Http404('You currently do not have any tasks.')
-
-        return response_message, response_result, response_status
 
     @blocklist_check_decorator
     def get(self, request: type[Request], type_param: str) -> JsonResponse:
