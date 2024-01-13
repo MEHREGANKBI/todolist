@@ -16,28 +16,30 @@ class Tag(models.Model):
 
 
 class CustomTaskModelManager(models.Manager):
-    def get_queryset(self, is_complete, tag, user) -> QuerySet:
+    def get_queryset(self, is_complete = None, tag= None, user = None) -> QuerySet:
+        # Parameters of this function are either lists or None.
 
         query_set = super().get_queryset()
+        # Here comes the chained filtering
+        query_set = self.__filter_by_tag(tag= tag, query_set = query_set)
 
-        query_set = self.__filter_by_tag(tag= tag)
+        query_set = self.__filter_by_user(user= user, query_set = query_set)
 
-        query_set = self.__filter_by_user(user= user)
-
-        query_set = self.__filter_by_completeness(is_complete= is_complete)
+        query_set = self.__filter_by_completeness(is_complete= is_complete, query_set = query_set)
 
         return query_set
 
     
     
-    def __filter_by_tag(self, tag):
-        pass
+    def __filter_by_tag(self, tag, query_set):
+        return query_set
 
-    def __filter_by_user(self,user):
-        pass
 
-    def __filter_by_completeness(self,is_complete):
-        pass
+    def __filter_by_user(self,user, query_set):
+        return query_set
+
+    def __filter_by_completeness(self,is_complete, query_set):
+        return query_set
     
 
 class Task(models.Model):
