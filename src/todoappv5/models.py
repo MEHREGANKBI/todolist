@@ -32,13 +32,33 @@ class CustomTaskModelManager(models.Manager):
     
     
     def __filter_by_tag(self, tag, query_set):
+        if not tag == None:
+            # Given a list of tag strings, it'll return a queryset of tag instances matching those strings.
+            tags_list = Tag.objects.filter(tag__in = tag)
+            # If we pass this list of instances to a task filter, it'll return a queryset of rows with those tags. 
+            query_set = query_set.filter(Tag__in = tags_list)
+
+        else:
+            pass
+
         return query_set
 
 
     def __filter_by_user(self,user, query_set):
+        if not user == None:
+            query_set = query_set.filter(User = user)
+
+        else:
+            pass
+
         return query_set
 
     def __filter_by_completeness(self,is_complete, query_set):
+        if not is_complete == None:
+            query_set = query_set.filter(is_complete__in = is_complete)
+        else:
+            pass
+
         return query_set
     
 
