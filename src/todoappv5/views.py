@@ -32,7 +32,7 @@ class TaskView(APIView):
 
 
     @blocklist_check_decorator
-    def get(self, request: type[Request], type_param: str) -> JsonResponse:
+    def get(self, request: type[Request]) -> JsonResponse:
         '''
         Parameters:
             self: unused.
