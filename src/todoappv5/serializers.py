@@ -75,8 +75,7 @@ class PUTTaskSerializer(serializers.ModelSerializer):
 class TaskQueryParamsSerializer(serializers.Serializer):
     # Even though this serializer won't read from or write to the Tag model, the tag field must meet the constraints
     # of this field. so instead of defining a new charfield, we refer to the model field for validation.
-    tag = serializers.ListField(child= serializers.ModelField(model_field= Tag().__meta.get_field('tag')), required= False)
+    tag = serializers.ListField(child= serializers.CharField(min_length= 2, max_length = 16), required= False)
     # Eventhough we accept only one booelan filter as the value of <is_complete>, it'll still be a list
     # and that's based on the implmentation of the query_params attribute of the DRF request object.
-    is_complete = serializers.ListField(child= serializers.ModelField(model_field= Task().__meta.get_field('is_complete'))
-                                        ,required= False)
+    is_complete = serializers.ListField(child= serializers.BooleanField(), required= False)
