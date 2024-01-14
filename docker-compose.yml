@@ -14,6 +14,13 @@ services:
     image: "redis:7.2.3-alpine3.19"
     ports:
       - "6379:6379"
+  
+  nginx_reverse_proxy:
+    image: "nginx_configured:1.25.3-alpine3.18"
+    ports:
+      - "80:80"
+    depends_on:
+      - todolist-django-sqlite
 
 volumes:
   todolist_sqlite_volume: 
