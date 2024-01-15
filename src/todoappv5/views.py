@@ -67,17 +67,13 @@ class TaskView(APIView):
     
     @blocklist_check_decorator
     def post(self, request):
-        response_dict = {}
-        response_status = None
         user_obj = request.user
         # If the json is not valid, it'll send an automatic response, the pattern of which is not the same as my responses. 
         deserialized_data = POSTSerializer(data= request.data)
 
         if deserialized_data.is_valid():
             deserialized_data.save(user_obj= user_obj)
-            response_dict['message'] =  'SUCCESS!'
-            response_dict['result'] = 'Your task was successfully created.'
-            response_status = status.HTTP_200_OK
+            response_dict, response_status= make_success_response(result='Your task was successfully created.')
 
         else:
             raise ParseError(deserialized_data.errors.__str__())
@@ -86,16 +82,13 @@ class TaskView(APIView):
     
     @blocklist_check_decorator
     def delete(self, request, id_param):
-        response_dict = {}
-        response_status = None
         user_obj = request.user
         # now we check if the task with the given id is owned by the user whose username is in the token.
         if task_exists(id_param) and user_owns_task(user_obj, id_param):
                 task_obj = Task.objects.get(id = id_param)
                 task_obj.delete()
-                response_status = status.HTTP_200_OK
-                response_dict['message'] = 'SUCCESS...'
-                response_dict['result'] = 'The task was successfully removed.'
+
+                response_dict, response_status = make_success_response(result='The task was successfully removed.')
         else:
                 raise Http404('Task not found.')
         
@@ -104,17 +97,14 @@ class TaskView(APIView):
                 
     @blocklist_check_decorator
     def put(self, request):
-        response_dict = {}
-        response_status = None
         user_obj = request.user
         deserialized_data = PUTTaskSerializer(data= request.data)
 
         #this serializer will check if the task exists too so we don't have to check seperately.
         if deserialized_data.is_valid() and user_owns_task(user_obj, deserialized_data.validated_data['id']): # type: ignore
             deserialized_data.save()
-            response_status = status.HTTP_200_OK
-            response_dict['message'] = 'SUCCESS...'
-            response_dict['result'] = 'The status of the task was updated successfully.' 
+
+            response_dict, response_status = make_success_response(result='The status of the task was updated successfully.') 
 
         else:
             raise Http404('Task not found.')
