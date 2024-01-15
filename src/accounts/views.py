@@ -5,6 +5,7 @@ from rest_framework.exceptions import ParseError, PermissionDenied
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .serializers import UserCreationSerializer, TokenBlockListSerializer, RefreshTokenSerializer
+from response_factory.default_responses import make_success_response
 
 
 
@@ -43,15 +44,11 @@ class SignupView(APIView):
 class LogOutView(APIView):
 
     def post(self,request):
-        response_dict = {}
-        response_status = None
         deserialized_data = TokenBlockListSerializer(data= request.data)
 
         if deserialized_data.is_valid():
             deserialized_data.save()
-            response_dict['message'] = 'SUCCESS...'
-            response_dict['result'] = deserialized_data.validated_data
-            response_status = status.HTTP_200_OK
+            response_dict, response_status = make_success_response(result=deserialized_data.validated_data)
         
         else:
             raise ParseError(deserialized_data.errors.__str__())
