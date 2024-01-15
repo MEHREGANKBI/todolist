@@ -66,9 +66,10 @@ class RefreshTokenWrapper(TokenRefreshView):
         # This serializer validates both the parsing errors and blocklisting errors.
         if deserialized_refresh_token.is_valid():
             refresh_view_return =  super().post(request=request)
+            response_dict, response_status = make_success_response(result= refresh_view_return)
         else:
             raise PermissionDenied(deserialized_refresh_token.errors.__str__())
         
-        return refresh_view_return
+        return JsonResponse(response_dict, safe= False, status = response_status)
                 
             
