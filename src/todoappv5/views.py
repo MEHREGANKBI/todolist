@@ -13,6 +13,7 @@ from rest_framework.exceptions import PermissionDenied, ParseError
 
 from .serializers import *
 from .view_helpers import *
+from response_factory.default_responses import make_success_response
 
 
 class TaskView(APIView):
@@ -45,20 +46,18 @@ class TaskView(APIView):
             Given a valid user <Request.user> and type_param, return the tasks of that very user, filtered based on the
             type_param constraints. Otherwise, return an error with its corresponding HTTP status.
         '''
-        response_dict = {}
-        response_status = None
 
         deserialized_query_params = TaskQueryParamsSerializer(data= request.query_params)
+
         if deserialized_query_params.is_valid():
             validated_data = deserialized_query_params.validated_data
+
             filtered_queryset = Task.objects.get_queryset(is_complete= validated_data.get('is_complete', None),
                                                           tag= validated_data.get('tag', None), user= request.user)
+            
             # With the queryset fully filtered to the client's liking, we can now serialize it.
             serialized_queryset = TaskGETSerializer(filtered_queryset, many= True)
-            response_dict['result'] = serialized_queryset.data
-            response_dict['message'] = 'SUCCESS...'
-            response_status = status.HTTP_200_OK
-         
+            response_dict, response_status = make_success_response(result= serialized_queryset.data)
         else:
             raise ParseError(deserialized_query_params.errors.__str__())
 
