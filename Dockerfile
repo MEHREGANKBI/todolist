@@ -15,4 +15,4 @@ COPY persistence/ /home/todolist/persistence/
 WORKDIR /home/todolist/src/
 
 # Entry point of the container
-CMD ["gunicorn", "todolist.wsgi:application", "-b" , "0.0.0.0:8000"]
+CMD ["/bin/sh", "./docker_img_entrypoint.sh"]
