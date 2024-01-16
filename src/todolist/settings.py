@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from os import getenv
 from datetime import timedelta
+from redis import Redis
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -159,3 +160,5 @@ SIMPLE_JWT = {
 }
 
 CONN_MAX_AGE= eval(getenv('DJANGO_DB_CONN_MAX_AGE'))
+
+REDIS_CONNECTION = Redis(host=getenv('DJANGO_REDIS_HOST'), port= 6379, decode_responses= True)
