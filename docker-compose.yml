@@ -6,6 +6,8 @@ services:
     image: "todolist:1.1"
     env_file:
       - ".env.docker"
+    depends_on:
+      - todolist-redis
     volumes:
       - todolist_sqlite_volume:/home/todolist/persistence/
       - static:/static/
