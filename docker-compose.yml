@@ -1,19 +1,18 @@
 version: "3"
 
 services:
+
   todolist-django-sqlite:
     image: "todolist:1.1"
-    ports:
-      - "8000:8000"
     env_file:
       - ".env.docker"
     volumes:
       - "todolist_sqlite_volume:/home/todolist/persistence/"
     
+  
   todolist-redis:
     image: "redis:7.2.3-alpine3.19"
-    ports:
-      - "6379:6379"
+  
   
   nginx_reverse_proxy:
     image: "nginx_configured:1.25.3-alpine3.18"
