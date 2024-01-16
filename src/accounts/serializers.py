@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 import jwt
 from os import getenv
-from redis import Redis
 from django.contrib.auth.password_validation import (UserAttributeSimilarityValidator,
                                                      MinimumLengthValidator,
                                                      CommonPasswordValidator,
