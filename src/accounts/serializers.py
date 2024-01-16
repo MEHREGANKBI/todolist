@@ -13,7 +13,7 @@ from django.contrib.auth.password_validation import (UserAttributeSimilarityVali
 
 from .secrets import salt
 from .models import *
-from todolist.settings import SIMPLE_JWT
+from todolist.settings import SIMPLE_JWT, REDIS_CONNECTION
 
 class UserCreationSerializer(serializers.ModelSerializer):
 
@@ -71,10 +71,9 @@ class TokenBlockListSerializer(serializers.ModelSerializer):
 
     
     def save(self):
-        redis_obj = Redis(host=getenv('DJANGO_REDIS_HOST'), port= 6379, decode_responses= True)
         # So as not to fill the cache, access token keys are given a max life time of 600 seconds. more than this,
         # the access token would be expired anyway. So why keep in the cache perpetually. 
-        redis_obj.setex(self.validated_data['access_token'] , 600,1)
+        REDIS_CONNECTION.setex(self.validated_data['access_token'] , 600,1)
 
         TokenBlockList.objects.create(refresh_token = self.validated_data['refresh_token'])
 
